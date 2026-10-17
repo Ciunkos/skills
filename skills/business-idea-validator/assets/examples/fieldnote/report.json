@@ -209,6 +209,7 @@
         "id": "customer",
         "from": 5,
         "to": 5,
+        "confidence": "same",
         "why": "Score stands. Confidence stays high: the segment, the buyer and the first forty contacts are all in the text."
       }
     ],
@@ -244,7 +245,8 @@
       "How many landscaping companies of this size exist in Poland?",
       "Have you confirmed the e-invoicing timeline for companies of this size?",
       "Which three apps have the owners you know tried and dropped, and why?"
-    ]
+    ],
+    "notes": ""
   },
   "verdict": {
     "label": "validate",

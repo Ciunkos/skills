@@ -35,7 +35,7 @@ Run from a working directory of the user's choice (`--out <dir>`, default the cu
 
 Take the idea from the argument, the prompt, or a file path. Decide the report language: the language of the idea text, unless `--lang` says otherwise.
 
-Apply `references/intake.md`. If the text is thin (under about 40 words, or missing who it is for, what it does, or how it makes money), ask the founder once, up to five questions in one message, and wait. If you cannot ask (non-interactive, or `--quick`), continue with assumptions and say so in the report.
+Apply `references/intake.md`. If the text is thin (under about 40 words, or missing who it is for as a role or person, what it does, or how it makes money), ask the founder once, up to five questions in one message, and wait. If you cannot ask (non-interactive, or `--quick`), continue with assumptions and say so in `synthesis.notes`.
 
 Store what you have as `idea.text` and `idea.answers` (`for`, `money`, `today`, `advantage`, `stage`; only the ones given).
 
@@ -44,23 +44,23 @@ Store what you have as `idea.text` and `idea.answers` (`for`, `money`, `today`, 
 Read `references/report-style.md` first. Then, for each rubric in the order `problem, customer, market, alternatives, monetization, distribution, feasibility, moat, founder, risks`:
 
 - Give the pass the idea text, the answers, the rubric file, the style rules and the output schema.
-- The pass returns one JSON object matching `assets/rubric-output.schema.json`: `id`, `score` 1 to 5, `confidence` low/medium/high, `evidence` (exact quotes), `assumptions`, `reasoning` (at most 120 words), `questions`, `improve`.
+- The pass returns one JSON object matching `assets/rubric-output.schema.json`: `id`, `score` 1 to 5, `confidence` low/medium/high, `evidence` (exact quotes), `assumptions`, `reasoning` (at most 160 words), `questions`, `improve`.
 
 Run the passes in parallel through the `business-idea-rubric` subagent when the Agent tool is available (one agent per rubric, brief it with the file paths and the idea; ask it to return only the JSON). Otherwise score them yourself, one rubric at a time, reading the rubric file fresh each time so the anchors stay in front of you.
 
-Save the ten results to `<out>/rubrics/<id>.json` as you go. Validate each one: `node ${CLAUDE_SKILL_DIR}/scripts/check.mjs --rubric <out>/rubrics/<id>.json`. Fix any problem it reports (usually a list that is too long or reasoning over 120 words) before moving on.
+Create `<out>/rubrics/` and save the ten results there as `<id>.json` as you go. Validate each one: `node ${CLAUDE_SKILL_DIR}/scripts/check.mjs --rubric <out>/rubrics/<id>.json`. Fix any problem it reports (usually a list that is too long or reasoning over 120 words) before moving on.
 
 ### 3. Critic pass
 
-Skip with `--quick`. Otherwise give the `business-idea-critic` subagent (or do it yourself) all ten results, the idea, and the rubric files. Its job: try to refute every score of 1, 2 or 5 using the anchors and the text, and flag any rubric where the confidence does not match how much the text says. It returns `{ "changes": [{ "id", "from", "to", "why" }], "notes": "" }`. Apply the changes to the rubric results and keep the critic object for the report.
+Skip with `--quick`. Otherwise give the `business-idea-critic` subagent (or do it yourself) all ten results, the idea, and the rubric files. Its job: try to refute every score of 1, 2 or 5 using the anchors and the text, and flag any rubric where the confidence does not match how settled the score is. It returns `{ "changes": [{ "id", "from", "to", "confidence", "why" }], "notes": "" }` where `confidence` is `same` or the new level; `why` and `notes` are in the report language. Apply each change to the rubric result: set the score and confidence, and rewrite that rubric's `reasoning` so it argues for the new score (a result must not contradict itself). Keep the critic object for the report.
 
 ### 4. Synthesis
 
-With the final scores, write the synthesis object (`assets/report.schema.json`, `synthesis`): `summary` (three sentences), `riskiestAssumption` (one), `experiments` (one to three, 14 days max, each with a numeric metric), `pivots` (only real ones; empty is fine), `openQuestions` (the rubric questions, deduplicated, most important first). Follow the synthesis rules in `references/report-style.md`.
+With the final scores, write the synthesis object (`assets/report.schema.json`, `synthesis`): `summary` (three sentences), `riskiestAssumption` (one), `experiments` (one to three, 14 days max, each with a numeric metric), `pivots` (only real ones; empty is fine), `openQuestions` (the rubric questions, deduplicated, most important first, at most eight), `notes` (how the report was made when it matters, else empty). Follow the synthesis rules in `references/report-style.md`.
 
 ### 5. Assemble and render
 
-Write `<out>/report.json` with `version: "1"`, `lang`, `idea`, `rubrics` (all ten), `critic` (if run), `synthesis`, `meta` (`model`: the model you are running on as you know it, `createdAt`: ISO date, `generator`: "skill"). Leave `verdict` out or as an empty object; the script computes it.
+Write `<out>/report.json` with `version: "1"`, `lang`, `idea`, `rubrics` (all ten), `critic` (if run), `synthesis`, `verdict: {}` (the script fills it; never write a verdict by hand), `meta` (`model`: the model you are running on as you know it, `createdAt`: ISO date, `generator`: "skill").
 
 Run `node ${CLAUDE_SKILL_DIR}/scripts/check.mjs <out>/report.json`. It validates everything, writes the verdict into the file and writes `<out>/report.md`. Fix problems until it prints `OK`.
 

@@ -28,6 +28,13 @@ test('renders English with all ten rubric headings and the verdict', () => {
   assert.ok(md.includes('> FieldNote'), 'idea quoted');
 });
 
+test('notes print only when present', () => {
+  const r = JSON.parse(JSON.stringify(report));
+  assert.ok(!renderMarkdown(r, 'en').includes('**Notes.**'));
+  r.synthesis.notes = 'No questions could be asked.';
+  assert.ok(renderMarkdown(r, 'en').includes('**Notes.** No questions could be asked.'));
+});
+
 test('renders Polish labels for the same data', () => {
   const md = renderMarkdown(report, 'pl');
   assert.match(md, /^# Walidacja pomysłu na biznes/);

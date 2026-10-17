@@ -25,7 +25,7 @@
 
 - **High** when the text addresses the regulatory or platform context.
 - **Medium** when the category makes the exposure predictable.
-- **Low** when you are unsure which jurisdiction or platform applies; say which you assumed.
+- **Low** when you are unsure which jurisdiction or platform applies; say which you assumed. A regulation that plainly applies to the core activity (prescription drugs, payments, gambling) is settled by general knowledge: high confidence even when the text ignores it.
 
 ## Traps
 

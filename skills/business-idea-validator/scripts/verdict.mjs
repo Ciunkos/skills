@@ -35,8 +35,9 @@ export function verdict(report) {
   const pivots = (report.synthesis && report.synthesis.pivots) || [];
   const counts = { coreRed: coreRed.length, lows: lows.length, highs: highs.length, coreUnsure: coreUnsure.length };
 
-  if (coreRed.length >= RULES.stopCoreRed) return { label: 'stop', rule: 'stop-core', decisive: coreRed, counts };
+  /* Pivot przed Stop: gdy synteza widzi kierunek, dwa albo trzy czerwone rubryki rdzenia to zmiana kierunku, nie koniec. */
   if (coreRed.length >= RULES.pivotCoreRed && pivots.length) return { label: 'pivot', rule: 'pivot-core', decisive: coreRed, counts };
+  if (coreRed.length >= RULES.stopCoreRed) return { label: 'stop', rule: 'stop-core', decisive: coreRed, counts };
   if (lows.length) return { label: 'validate', rule: 'validate-low', decisive: lows, counts };
   if (coreUnsure.length) return { label: 'validate', rule: 'validate-uncertain', decisive: coreUnsure, counts };
   if (highs.length >= RULES.buildHighs) return { label: 'build', rule: 'build-strong', decisive: highs, counts };

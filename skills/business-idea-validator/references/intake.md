@@ -7,7 +7,7 @@ Score only what the founder wrote. A thin description produces low confidence, a
 Ask when any of these is true:
 
 - The idea text is under about 40 words.
-- It does not say **who** it is for (a person or role, not a market).
+- It does not say **who** it is for. A role or a person counts ("owners of small landscaping crews"); a market or a crowd does not ("students and busy professionals", "everyone").
 - It does not say **what** the product does in one sentence.
 - It does not say **how** it makes money (price, model, or "free, and here is who pays").
 
@@ -25,7 +25,9 @@ Pick the ones that are missing. Use the founder's language and keep each questio
 
 ## When you cannot ask
 
-Running non-interactively (no user turn available, or `--quick`): proceed with assumptions. Each rubric records what it assumed in `assumptions`, and the synthesis lists the unanswered items under open questions. Never invent answers and present them as the founder's.
+Running non-interactively (no user turn available, or `--quick`): proceed with assumptions. Each rubric records what it assumed in `assumptions`, the synthesis lists the unanswered items under open questions, and `synthesis.notes` says that no questions could be asked. Never invent answers and present them as the founder's.
+
+Expect a pull toward "Validate first" in non-interactive runs: the core rubrics reach high confidence only when the text itself covers today's alternatives and willingness to pay. That is the honest outcome for a thin text, not a defect.
 
 ## Where the answers go
 

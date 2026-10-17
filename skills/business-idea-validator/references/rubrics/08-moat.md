@@ -25,7 +25,7 @@
 
 - **High** when the text addresses data, network or distribution advantages explicitly.
 - **Medium** when the category makes the moat structure predictable.
-- **Low** when you are speculating about advantages the text never mentions.
+- **Low** when you are speculating about advantages the text never mentions. An obvious wrapper over a general model, with the vendor already shipping the feature, is settled by general knowledge: score it with high confidence.
 
 ## Traps
 

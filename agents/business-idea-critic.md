@@ -18,7 +18,7 @@ Do this:
 Return **only** this JSON:
 
 ```
-{ "changes": [ { "id": "<rubric id>", "from": <old score>, "to": <new score>, "why": "<one or two sentences citing the anchor or the quote>" } ], "notes": "<at most three sentences on the overall read, or empty>" }
+{ "changes": [ { "id": "<rubric id>", "from": <old score>, "to": <new score>, "confidence": "same" | "low" | "medium" | "high", "why": "<one or two sentences citing the anchor or the quote>" } ], "notes": "<at most three sentences on the overall read, or empty>" }
 ```
 
-Change a score only when you can name the anchor it should match. Changing confidence without changing the score is also a change: use the same `from`/`to` score and explain in `why` that confidence moved and to what. An empty `changes` list is a valid answer. Write `why` and `notes` in the idea's language.
+Change a score only when you can name the anchor it should match. To change only confidence, keep `from` equal to `to` and set `confidence` to the new level; otherwise set `confidence` to `same`. An empty `changes` list is a valid answer. Write `why` and `notes` in the idea's language. Confidence means how settled the score is: by the text, or by general knowledge no text would change; a score built on the founder's unverified assumptions is not high.

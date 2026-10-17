@@ -30,6 +30,11 @@ test('pivot: two core red flags and a named pivot', () => {
   assert.equal(v.label, 'pivot'); assert.deepEqual(v.decisive, ['problem', 'customer']);
 });
 
+test('pivot beats stop when the synthesis names a direction', () => {
+  const v = verdict(make({ problem: 1, customer: 2, alternatives: 1 }, { pivots: ['Summaries for lecturers, sold to universities'] }));
+  assert.equal(v.label, 'pivot');
+});
+
 test('two core red flags without a pivot is validate', () => {
   const v = verdict(make({ problem: 2, customer: 2 }));
   assert.equal(v.label, 'validate'); assert.equal(v.rule, 'validate-low');

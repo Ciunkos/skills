@@ -22,9 +22,11 @@
 
 ## Confidence
 
+General rule (see `report-style.md`): high when the text settles the score, or when general knowledge settles it in a way no extra text would change; medium when you filled gaps the founder could still overturn; low when you assumed most of it.
+
 - **High** when the text or answers name the segment, the buyer and the way to reach them.
 - **Medium** when the segment is there but buyer or reach is missing.
-- **Low** when you inferred the customer from the product description.
+- **Low** when you inferred the customer from the product description. A stated non-segment ("everyone", "anyone who") is not an inference: score 1 or 2 with high confidence, because the text settles that no customer was chosen.
 
 ## Traps
 

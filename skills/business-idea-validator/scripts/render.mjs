@@ -49,6 +49,7 @@ export function renderMarkdown(report, lang = report.lang) {
   parts.push('');
   parts.push(`**${S.riskiest}.** ${block(s.riskiestAssumption)}`);
   parts.push('');
+  if (s.notes && String(s.notes).trim()) { parts.push(`**${S.notes}.** ${block(s.notes)}`); parts.push(''); }
   parts.push(`## ${S.experiments}`);
   parts.push('');
   s.experiments.forEach((e, i) => {

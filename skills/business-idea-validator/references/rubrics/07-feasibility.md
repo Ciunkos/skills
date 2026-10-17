@@ -30,7 +30,7 @@
 
 - Do not reward complexity; a hard build is a cost, not a moat, unless rubric 8 says otherwise.
 - "We will use AI to do X" needs a check that AI does X reliably today for this input.
-- Hardware, regulated data, and physical operations change the time scale; say so.
+- Hardware, regulated data, and physical operations change the time scale; say so. The regulatory exposure itself is scored in rubric 10; here count only its effect on build time and scope, in one sentence.
 - An MVP that cannot be built without the whole platform is not an MVP.
 
 ## Output

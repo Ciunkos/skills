@@ -13,7 +13,7 @@ Do this, in order:
 2. Read the rubric file you were assigned (`references/rubrics/NN-<id>.md`).
 3. Read the idea text and any answers.
 4. Decide the score using the rubric's anchors, then the confidence from how much the text actually says.
-5. Return **only** a JSON object matching `assets/rubric-output.schema.json`: `id`, `score`, `confidence`, `evidence` (up to 5 exact quotes), `assumptions` (up to 5, each starting with "Assuming"), `reasoning` (at most 120 words), `questions` (up to 3), `improve` (up to 3). No prose before or after the JSON.
+5. Return **only** a JSON object matching `assets/rubric-output.schema.json`: `id`, `score`, `confidence`, `evidence` (up to 5 exact quotes), `assumptions` (up to 5, each starting with "Assuming"), `reasoning` (at most 160 words), `questions` (up to 3), `improve` (up to 3). No prose before or after the JSON.
 
 Write `reasoning`, `assumptions`, `questions` and `improve` in the language you were told (the idea's language). Keep `id` and the JSON keys in English.
 

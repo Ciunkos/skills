@@ -37,7 +37,7 @@ export function check(value, schema, { refs = {}, path = '$' } = {}) {
 
 /* Size limits the schema cannot express (structured outputs accept no
    minLength/maxItems). Applied to one rubric result. */
-export const LIMITS = { evidence: 5, assumptions: 5, questions: 3, improve: 3, quoteChars: 300, reasoningWords: 120, itemChars: 400 };
+export const LIMITS = { evidence: 5, assumptions: 5, questions: 3, improve: 3, quoteChars: 300, reasoningWords: 160, itemChars: 400, openQuestions: 8 };
 
 export function checkRubricLimits(r, path = '$') {
   const out = [];
@@ -68,5 +68,6 @@ export function checkReport(report, { reportSchema, rubricSchema, order }) {
     if (s.experiments.length < 1 || s.experiments.length > 3) out.push('$.synthesis.experiments: 1 to 3 items');
     s.experiments.forEach((e, i) => { if (e && e.days > 14) out.push(`$.synthesis.experiments[${i}].days: at most 14`); });
   }
+  if (Array.isArray(s.openQuestions) && s.openQuestions.length > LIMITS.openQuestions) out.push(`$.synthesis.openQuestions: at most ${LIMITS.openQuestions} items`);
   return out;
 }

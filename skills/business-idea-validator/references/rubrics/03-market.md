@@ -22,6 +22,8 @@
 
 ## Confidence
 
+General rule (see `report-style.md`): high when the text settles the score, or when general knowledge settles it in a way no extra text would change; medium when you filled gaps the founder could still overturn; low when you assumed most of it.
+
 - **High** when the text gives customer count, price and a why-now, or you could derive them from named facts.
 - **Medium** when one of the three had to be assumed.
 - **Low** when the arithmetic rests on guesses; put the guesses in `assumptions`.

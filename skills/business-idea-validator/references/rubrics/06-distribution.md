@@ -24,7 +24,7 @@
 
 - **High** when the text names channels and the founder's access to them.
 - **Medium** when the channel is implied by the customer and category.
-- **Low** when you had to guess how anyone would hear of it.
+- **Low** when you had to guess how anyone would hear of it. If the text says nothing about reaching customers, score 3 with low confidence and ask; silence is not a 2.
 
 ## Traps
 

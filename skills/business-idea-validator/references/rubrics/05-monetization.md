@@ -24,7 +24,7 @@
 
 - **High** when the text gives price, model and some sign of willingness to pay.
 - **Medium** when price or model is given and the rest is a reasonable assumption.
-- **Low** when the whole sketch is yours.
+- **Low** when the whole sketch is yours. General knowledge can still settle a mismatch with high confidence (ads as the only revenue for a niche tool, a free category nobody pays for); say so in `reasoning`.
 
 ## Traps
 

@@ -32,9 +32,9 @@ export const LABELS = {
       stop: { label: 'Stop', line: 'The core rubrics fail with high confidence. Spend the time on a different idea.' }
     },
     rule: {
-      'stop-core': 'Rule: {n} of the 4 core rubrics scored 2 or lower with high confidence ({ids}).',
+      'stop-core': 'Rule: {n} of the 4 core rubrics scored 2 or lower with high confidence ({ids}), and the synthesis found no pivot worth more than the original.',
       'pivot-core': 'Rule: {n} core rubrics scored 2 or lower with high confidence ({ids}) and the synthesis names a pivot.',
-      'validate-low': 'Rule: {n} rubric(s) scored 2 or lower ({ids}). Each one is a question an experiment can answer.',
+      'validate-low': 'Rule: {n} rubric(s) scored 2 or lower ({ids}). Each one needs an answer or a change to the idea before building.',
       'validate-uncertain': 'Rule: no red flags, but core rubrics are not rated with high confidence ({ids}). The idea text leaves them open.',
       'validate-default': 'Rule: no red flags, but fewer than 6 rubrics scored 4 or higher. The idea is not yet strong enough to build on.',
       'build-strong': 'Rule: no rubric at 2 or lower and {n} rubrics at 4 or higher, core rated with high confidence.'
@@ -47,6 +47,7 @@ export const LABELS = {
       verdict: 'Verdict',
       why: 'Why this verdict',
       summary: 'Summary',
+      notes: 'Notes',
       riskiest: 'Riskiest assumption',
       experiments: 'Cheapest experiments (next two weeks)',
       pivots: 'Pivot options',
@@ -77,7 +78,7 @@ export const LABELS = {
       monetization: { name: 'Monetyzacja', question: 'Czy zapłacą, jak, i czy liczby się spinają?' },
       distribution: { name: 'Dystrybucja', question: 'Jak pierwsi klienci mają Cię znaleźć?' },
       feasibility: { name: 'Wykonalność', question: 'Czy da się to zbudować, jak szybko i co jest ryzykowne?' },
-      moat: { name: 'Obrona', question: 'Co powstrzyma kopię przed wygraną?' },
+      moat: { name: 'Trwałość przewagi', question: 'Co powstrzyma kopię przed wygraną?' },
       founder: { name: 'Dopasowanie założyciela', question: 'Dlaczego Ty, i czy masz czas oraz runway?' },
       risks: { name: 'Ryzyka', question: 'Prawo, regulacje, platformy, etyka?' }
     },
@@ -90,12 +91,12 @@ export const LABELS = {
       stop: { label: 'Stop', line: 'Rubryki rdzenia padają z wysoką pewnością. Poświęć ten czas innemu pomysłowi.' }
     },
     rule: {
-      'stop-core': 'Reguła: {n} z 4 rubryk rdzenia ma ocenę 2 lub niższą z wysoką pewnością ({ids}).',
-      'pivot-core': 'Reguła: {n} rubryki rdzenia mają ocenę 2 lub niższą z wysoką pewnością ({ids}), a synteza wskazuje pivot.',
-      'validate-low': 'Reguła: {n} rubryk ma ocenę 2 lub niższą ({ids}). Każda z nich to pytanie, na które odpowie eksperyment.',
-      'validate-uncertain': 'Reguła: bez czerwonych flag, ale rubryki rdzenia nie są ocenione z wysoką pewnością ({ids}). Tekst pomysłu zostawia je otwarte.',
+      'stop-core': 'Reguła: rubryki rdzenia z oceną 2 lub niższą przy wysokiej pewności: {ids} ({n} z 4), a synteza nie widzi kierunku wartego więcej niż oryginał.',
+      'pivot-core': 'Reguła: rubryki rdzenia z oceną 2 lub niższą przy wysokiej pewności: {ids} ({n} z 4), a synteza wskazuje zmianę kierunku.',
+      'validate-low': 'Reguła: rubryki z oceną 2 lub niższą: {ids} ({n}). Każda wymaga odpowiedzi albo zmiany w pomyśle przed budową.',
+      'validate-uncertain': 'Reguła: bez czerwonych flag, ale rubryki rdzenia bez wysokiej pewności: {ids}. Tekst pomysłu zostawia je otwarte.',
       'validate-default': 'Reguła: bez czerwonych flag, ale mniej niż 6 rubryk ma ocenę 4 lub wyższą. Pomysł nie jest jeszcze dość mocny, żeby na nim budować.',
-      'build-strong': 'Reguła: żadna rubryka nie ma oceny 2 lub niższej, {n} rubryk ma 4 lub więcej, rdzeń oceniony z wysoką pewnością.'
+      'build-strong': 'Reguła: żadna rubryka nie ma oceny 2 lub niższej, rubryki z oceną 4 lub wyższą: {ids} ({n}), rdzeń oceniony z wysoką pewnością.'
     },
     section: {
       title: 'Walidacja pomysłu na biznes',
@@ -105,6 +106,7 @@ export const LABELS = {
       verdict: 'Werdykt',
       why: 'Skąd ten werdykt',
       summary: 'Podsumowanie',
+      notes: 'Uwagi',
       riskiest: 'Najbardziej ryzykowne założenie',
       experiments: 'Najtańsze eksperymenty (najbliższe dwa tygodnie)',
       pivots: 'Opcje zmiany kierunku',
@@ -121,7 +123,7 @@ export const LABELS = {
       metric: 'Miara sukcesu',
       days: 'dni',
       score: 'Ocena',
-      cols: { rubric: 'Rubryka', band: 'Pasmo', confidence: 'Pewność' },
+      cols: { rubric: 'Rubryka', band: 'Poziom', confidence: 'Pewność' },
       meta: 'Wygenerowano {date} modelem {model}. Oceny to odczyt tekstu pomysłu przez model; werdykt to stała reguła nałożona na oceny. To ustrukturyzowana opinia, nie porada.',
       answerKeys: { for: 'Dla kogo', money: 'Jak zarabia', today: 'Czego używają dziś', advantage: 'Nieuczciwa przewaga', stage: 'Etap' }
     }

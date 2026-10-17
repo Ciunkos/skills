@@ -22,6 +22,8 @@
 
 ## Confidence
 
+General rule (see `report-style.md`): high when the text settles the score, or when general knowledge settles it in a way no extra text would change; medium when you filled gaps the founder could still overturn; low when you assumed most of it.
+
 - **High** when the text gives cost, frequency and who feels it, or the answers cover them.
 - **Medium** when two of the three are there.
 - **Low** when you had to assume most of it. A low score with low confidence is a question, not a judgment; say so in `questions`.

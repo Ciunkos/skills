@@ -22,6 +22,8 @@
 
 ## Confidence
 
+General rule (see `report-style.md`): high when the text settles the score, or when general knowledge settles it in a way no extra text would change; medium when you filled gaps the founder could still overturn; low when you assumed most of it.
+
 - **High** when the answers or text describe the founder's background, time and resources.
 - **Medium** when the stage field or hints give part of it.
 - **Low** when nothing is said; this is the usual case, do not inflate it.

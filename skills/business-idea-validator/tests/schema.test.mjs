@@ -23,6 +23,6 @@ test('wrong enum, missing field, extra field, wrong type', () => {
 
 test('limits: too many items, too long reasoning, empty reasoning', () => {
   assert.ok(checkRubricLimits({ ...good, questions: ['a', 'b', 'c', 'd'] }).some((p) => p.includes('questions')));
-  assert.ok(checkRubricLimits({ ...good, reasoning: Array(121).fill('w').join(' ') }).some((p) => p.includes('120 words')));
+  assert.ok(checkRubricLimits({ ...good, reasoning: Array(161).fill('w').join(' ') }).some((p) => p.includes('160 words')));
   assert.ok(checkRubricLimits({ ...good, reasoning: ' ' }).some((p) => p.includes('empty')));
 });
