@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rubric result",
+  "description": "What one rubric pass returns for one business idea. Sent as-is to the model as the structured output format, so it uses only the JSON Schema subset structured outputs accept: no numeric ranges, no string lengths. Length limits are enforced by scripts/check.mjs (see LIMITS there).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "score", "confidence", "evidence", "assumptions", "reasoning", "questions", "improve"],
+  "properties": {
+    "id": { "type": "string", "enum": ["problem", "customer", "market", "alternatives", "monetization", "distribution", "feasibility", "moat", "founder", "risks"] },
+    "score": { "type": "integer", "enum": [1, 2, 3, 4, 5], "description": "1 red flag, 2 weak, 3 unclear, 4 solid, 5 strong. Use the anchors in the rubric file." },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high"], "description": "How much the idea text actually says about this rubric. Low when the score rests mostly on assumptions." },
+    "evidence": { "type": "array", "items": { "type": "string" }, "description": "Up to 5 short quotes copied from the idea text or the answers. Empty when the text says nothing relevant." },
+    "assumptions": { "type": "array", "items": { "type": "string" }, "description": "Up to 5 things you had to assume to score. Each starts with 'Assuming'." },
+    "reasoning": { "type": "string", "description": "At most 120 words. Plain sentences. Why this score and not one higher or lower." },
+    "questions": { "type": "array", "items": { "type": "string" }, "description": "Up to 3 questions the founder should answer to raise confidence." },
+    "improve": { "type": "array", "items": { "type": "string" }, "description": "Up to 3 concrete changes to the idea that would raise the score." }
+  }
+}

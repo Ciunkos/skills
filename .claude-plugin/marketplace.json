@@ -1,0 +1,17 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "ciunkos",
+  "description": "Skills by Przemysław Zalewski (ciunkos.com): business idea validation with a fixed-rule verdict, in English or Polish.",
+  "owner": {
+    "name": "Przemysław Zalewski",
+    "url": "https://ciunkos.com"
+  },
+  "plugins": [
+    {
+      "name": "ciunkos",
+      "source": "./",
+      "category": "productivity",
+      "description": "business-idea-validator: ten-rubric scoring of a business idea with a fixed-rule verdict, experiments and open questions, in English or Polish."
+    }
+  ]
+}

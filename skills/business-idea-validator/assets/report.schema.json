@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Business idea validation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "lang", "idea", "rubrics", "synthesis", "verdict", "meta"],
+  "properties": {
+    "version": { "type": "string", "enum": ["1"] },
+    "lang": { "type": "string", "enum": ["en", "pl"] },
+    "idea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string" },
+        "answers": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "for": { "type": "string" },
+            "money": { "type": "string" },
+            "today": { "type": "string" },
+            "advantage": { "type": "string" },
+            "stage": { "type": "string" }
+          }
+        }
+      }
+    },
+    "rubrics": { "type": "array", "items": { "$ref": "rubric-output.schema.json" } },
+    "critic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changes", "notes"],
+      "properties": {
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "from", "to", "why"],
+            "properties": {
+              "id": { "type": "string" },
+              "from": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+              "to": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+              "why": { "type": "string" }
+            }
+          }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "synthesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "riskiestAssumption", "experiments", "pivots", "openQuestions"],
+      "properties": {
+        "summary": { "type": "string", "description": "Three sentences at most: what the idea is, what holds, what does not." },
+        "riskiestAssumption": { "type": "string", "description": "The one belief that, if false, kills the idea." },
+        "experiments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "what", "metric", "days"],
+            "properties": {
+              "name": { "type": "string" },
+              "what": { "type": "string", "description": "What to do, in two sentences, doable without building the product." },
+              "metric": { "type": "string", "description": "A number that decides pass or fail." },
+              "days": { "type": "integer", "description": "Calendar days, 14 at most." }
+            }
+          }
+        },
+        "pivots": { "type": "array", "items": { "type": "string" }, "description": "Neighboring problems or segments worth more than the original. Empty when none." },
+        "openQuestions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "rule", "decisive", "counts"],
+      "properties": {
+        "label": { "type": "string", "enum": ["build", "validate", "pivot", "stop"] },
+        "rule": { "type": "string" },
+        "decisive": { "type": "array", "items": { "type": "string" } },
+        "counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["coreRed", "lows", "highs", "coreUnsure"],
+          "properties": {
+            "coreRed": { "type": "integer" },
+            "lows": { "type": "integer" },
+            "highs": { "type": "integer" },
+            "coreUnsure": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "createdAt", "generator"],
+      "properties": {
+        "model": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "generator": { "type": "string", "enum": ["skill", "worker"] }
+      }
+    }
+  }
+}
