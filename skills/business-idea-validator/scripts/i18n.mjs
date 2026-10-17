@@ -65,7 +65,7 @@ export const LABELS = {
       days: 'days',
       score: 'Score',
       cols: { rubric: 'Rubric', band: 'Band', confidence: 'Confidence' },
-      meta: 'Generated with AI on {date} ({model}). AI can make mistakes, so read the scores as a starting point, not the final word. The verdict follows a fixed rule applied to those scores.',
+      meta: 'Generated with AI on {date}. AI can make mistakes, so read the scores as a starting point, not the final word. The verdict follows a fixed rule applied to those scores.',
       answerKeys: { for: 'Who it is for', money: 'How it makes money', today: 'What they use today', advantage: 'Unfair advantage', stage: 'Stage' }
     }
   },
@@ -124,7 +124,7 @@ export const LABELS = {
       days: 'dni',
       score: 'Ocena',
       cols: { rubric: 'Rubryka', band: 'Poziom', confidence: 'Pewność' },
-      meta: 'Wygenerowane przez AI {date} ({model}). AI może się mylić, więc traktuj oceny jako punkt wyjścia, nie ostatnie słowo. Werdykt wynika ze stałej reguły nałożonej na te oceny.',
+      meta: 'Wygenerowane przez AI {date}. AI może się mylić, więc traktuj oceny jako punkt wyjścia, nie ostatnie słowo. Werdykt wynika ze stałej reguły nałożonej na te oceny.',
       answerKeys: { for: 'Dla kogo', money: 'Jak zarabia', today: 'Czego używają dziś', advantage: 'Nieuczciwa przewaga', stage: 'Etap' }
     }
   }

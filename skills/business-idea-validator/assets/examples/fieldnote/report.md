@@ -299,4 +299,4 @@ The scores track the text. The one soft spot is monetization: no evidence yet th
 
 ---
 
-Generated with AI on 2026-10-17 (claude-opus-5-5). AI can make mistakes, so read the scores as a starting point, not the final word. The verdict follows a fixed rule applied to those scores.
+Generated with AI on 2026-10-17. AI can make mistakes, so read the scores as a starting point, not the final word. The verdict follows a fixed rule applied to those scores.

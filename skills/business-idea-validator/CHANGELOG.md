@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Report footer is a plain AI disclaimer: generated with AI, can make mistakes, scores are a starting point, the verdict follows a fixed rule.
+- Report footer is a plain AI disclaimer without the model name: generated with AI, can make mistakes, scores are a starting point, the verdict follows a fixed rule.
 
 ## 0.1.0
 
