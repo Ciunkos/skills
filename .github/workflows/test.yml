@@ -7,9 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - uses: actions/setup-node@v4
         with:
           node-version: 24
       - run: node --test
       - run: for f in $(git ls-files '*.mjs'); do node --check "$f"; done
       - run: npx -y skills-ref validate skills/business-idea-validator
+      - run: node scripts/release-plan.mjs --check

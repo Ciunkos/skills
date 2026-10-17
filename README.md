@@ -37,3 +37,9 @@ Rules for contributors are in `AGENTS.md`.
 ## License
 
 MIT, see `LICENSE`.
+
+## Releases
+
+Every push to `main` that raises a version publishes a [GitHub Release](https://github.com/Ciunkos/skills/releases) with the notes from the skill's `CHANGELOG.md` and a `.skill` file you can upload to claude.ai or Claude Desktop. The latest one is always at [releases/latest/download/business-idea-validator.skill](https://github.com/Ciunkos/skills/releases/latest/download/business-idea-validator.skill).
+
+To release a change: `node scripts/bump.mjs <skill> patch|minor|major`, write the new `## <version>` section in the skill's `CHANGELOG.md`, commit, push. `node scripts/release-plan.mjs --check` tells you before the push whether the release would go through.

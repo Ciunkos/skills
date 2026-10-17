@@ -1,0 +1,38 @@
+name: release
+
+# Every push to main releases what has a new version: each skill whose SKILL.md version has no
+# `<skill>-v<version>` tag yet (a GitHub Release with its .skill file), and the pack when
+# .claude-plugin/plugin.json has no `v<version>` tag yet (with every .skill file). Nothing new,
+# nothing released. scripts/release-plan.mjs decides; this only runs it after the tests pass.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node --test
+      - run: npx -y skills-ref validate skills/business-idea-validator
+      - name: Plan
+        run: node scripts/release-plan.mjs --check
+      - name: Package and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/release-plan.mjs --publish --out dist
