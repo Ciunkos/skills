@@ -2,8 +2,6 @@
 
 Agent Skills by [Przemysław Zalewski](https://ciunkos.com), published in the [Agent Skills](https://agentskills.io) format and as a Claude Code plugin.
 
-> Placeholder: the GitHub owner and the package name are not final. Search for `OWNER` before publishing.
-
 | Skill | What it does |
 |---|---|
 | [business-idea-validator](skills/business-idea-validator/) | Scores a business idea on ten rubrics (1 to 5, with quoted evidence and confidence) and applies a fixed verdict rule: Build, Validate first, Pivot or Stop. Returns Markdown and JSON, in English or Polish. Also runs online at [ciunkos.com/business-idea-validator](https://ciunkos.com/business-idea-validator). |
@@ -13,7 +11,7 @@ Agent Skills by [Przemysław Zalewski](https://ciunkos.com), published in the [A
 **Claude Code**
 
 ```
-/plugin marketplace add OWNER/skills
+/plugin marketplace add Ciunkos/skills
 /plugin install ciunkos@ciunkos
 ```
 
