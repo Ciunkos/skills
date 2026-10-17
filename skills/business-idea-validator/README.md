@@ -38,4 +38,4 @@ node scripts/check.mjs assets/examples/fieldnote/report.json --stdout
 ## Limits
 
 - It reads your text. It does not search the web, so competitors and market numbers come from the model's general knowledge and are marked as assumptions.
-- It is a structured opinion, not advice. Treat the experiments as the output, not the verdict.
+- It is generated with AI and can be wrong. Treat the scores as a starting point and the experiments as the output, not the verdict.

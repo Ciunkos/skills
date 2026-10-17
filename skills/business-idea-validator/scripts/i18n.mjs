@@ -65,7 +65,7 @@ export const LABELS = {
       days: 'days',
       score: 'Score',
       cols: { rubric: 'Rubric', band: 'Band', confidence: 'Confidence' },
-      meta: 'Generated {date} with {model}. Scores are the model’s reading of the idea text; the verdict is a fixed rule applied to the scores. This is a structured opinion, not advice.',
+      meta: 'Generated with AI on {date} ({model}). AI can make mistakes, so read the scores as a starting point, not the final word. The verdict follows a fixed rule applied to those scores.',
       answerKeys: { for: 'Who it is for', money: 'How it makes money', today: 'What they use today', advantage: 'Unfair advantage', stage: 'Stage' }
     }
   },
@@ -124,7 +124,7 @@ export const LABELS = {
       days: 'dni',
       score: 'Ocena',
       cols: { rubric: 'Rubryka', band: 'Poziom', confidence: 'Pewność' },
-      meta: 'Wygenerowano {date} modelem {model}. Oceny to odczyt tekstu pomysłu przez model; werdykt to stała reguła nałożona na oceny. To ustrukturyzowana opinia, nie porada.',
+      meta: 'Wygenerowane przez AI {date} ({model}). AI może się mylić, więc traktuj oceny jako punkt wyjścia, nie ostatnie słowo. Werdykt wynika ze stałej reguły nałożonej na te oceny.',
       answerKeys: { for: 'Dla kogo', money: 'Jak zarabia', today: 'Czego używają dziś', advantage: 'Nieuczciwa przewaga', stage: 'Etap' }
     }
   }
