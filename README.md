@@ -23,7 +23,7 @@ claude plugin marketplace add Ciunkos/skills
 claude plugin install ciunkos@ciunkos
 ```
 
-Restart Claude Code, then `/przemo <question or task>` or `/business-idea-validator <your idea>`. If another plugin has a skill with the same name, use the full name: `/ciunkos:przemo`.
+Run `/reload-plugins` (or start a new session), then `/przemo <question or task>` or `/business-idea-validator <your idea>`. If another plugin has a skill with the same name, use the full name: `/ciunkos:przemo`.
 
 **Codex and other agents that read Agent Skills** (Cursor, Windsurf, custom): clone once and symlink the skills you want into the folder your agent loads skills from.
 
@@ -39,14 +39,25 @@ Other agents use other folders, for example `~/.agents/skills/` or `~/.claude/sk
 
 ## Update
 
-**Claude Code**, from a terminal:
+**Claude Code**, inside a session:
+
+```
+/plugin marketplace update ciunkos
+/reload-plugins
+```
+
+The first command refreshes the marketplace and updates the plugins installed from it. The second loads the new version into the open session, no restart needed.
+
+Or from a terminal:
 
 ```
 claude plugin marketplace update ciunkos
 claude plugin update ciunkos@ciunkos
 ```
 
-Then restart Claude Code. `claude plugin list` shows the installed version. The current version and what changed are on the [releases page](https://github.com/Ciunkos/skills/releases) and in each skill's `CHANGELOG.md`.
+Then run `/reload-plugins` in an open session, or start a new one.
+
+**Automatic updates:** in a session open `/plugin`, go to the Marketplaces tab, select `ciunkos` and choose "Enable auto-update". Third-party marketplaces have it off by default. `claude plugin list` shows the installed version. The current version and what changed are on the [releases page](https://github.com/Ciunkos/skills/releases) and in each skill's `CHANGELOG.md`.
 
 **Codex and other agents:** `git -C ~/ciunkos-skills pull`. The symlinks pick up the new version on the next session.
 
@@ -63,8 +74,8 @@ For Codex and other agents, delete the symlink (for example `rm ~/.codex/skills/
 
 ## Troubleshooting
 
-- `Unknown command: /przemo`: restart Claude Code after installing or updating, then check `claude plugin list` shows `ciunkos@ciunkos` as enabled.
-- An old version keeps running: run both update commands above, then restart.
+- `Unknown command: /przemo`: run `/reload-plugins` or start a new session, then check `claude plugin list` shows `ciunkos@ciunkos` as enabled.
+- An old version keeps running: `/plugin marketplace update ciunkos`, then `/reload-plugins`.
 - Two skills with the same name: call it by its full name, `/ciunkos:przemo`.
 
 ## Develop
