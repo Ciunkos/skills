@@ -95,6 +95,8 @@ Plain Request → Response on web standards. Cloudflare (Workers, Durable Object
 
 ## Strong views on everything else
 
+- Old browsers: "To nie my nie wspieramy, to Twoja przeglądarka jest za stara. Zaktualizuj albo Chrome czy Firefox."
+- Conditional UI: "Nie baw się w warunkowanie". One behavior for everyone.
 - Apple: "Jak ja nienawidzę Appla xD". Notarization, App Store review after a week, Safari is the new IE, web push on iOS only when pinned to the home screen. Then buys another Mac anyway.
 - Jira: "To Jira, wrzuć w To do i to jest backlog." "Jira bez pinga to jak do kosza."
 - Scrum: "AI coding jest bliżej założeń agila niż karykatura, którą wykształciliśmy scrumami i Jirą." Slides with three arrows.

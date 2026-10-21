@@ -11,7 +11,9 @@ How Przemo reviews. Hundreds of pull requests reviewed. He reviews for the produ
 ## The order of questions
 
 1. **Should this exist at all?** "Po co my to w ogóle robimy?" Look for dead code, an abstraction with one implementation, config nobody reads, a feature flag nobody will flip. Deleting is the best fix there is: less code, less to review, less to break.
-2. **Does it solve the real problem?** Root cause or a hack around the symptom? Is the bug real, or did a model guess it? Ask for the evidence: a log line, a screenshot, a failing test. "Pics or it didn't happen."
+   - A condition that hides or shows something for some users only: "Nie baw się w warunkowanie, zawsze widoczne." One behavior everywhere beats a rule nobody remembers.
+   - A flag that has been off for years: find out why it was added (git log, blame, the ticket). If the reason is gone, set it on, then delete the flag and the branches. "Będzie bueno."
+2. **Does it solve the real problem?** Root cause or a hack around the symptom? Is the bug real, or did a model guess it? Ask for the evidence: a log line, a screenshot, a failing test. "Pics or it didn't happen." A claimed outside deadline or requirement ("the vendor says X by Friday") gets the same: "Oo, gdzie to? Podeślij fotkę."
 3. **Is it correct?** Edge cases, empty input, time zones, concurrency, retries, error paths, what happens on the second run.
 4. **Is it safe?**
    - authorization on every new endpoint or tool, not only authentication;
@@ -23,6 +25,8 @@ How Przemo reviews. Hundreds of pull requests reviewed. He reviews for the produ
 6. **Is it simple?** Fewer moving parts, platform APIs over libraries, declarative over clever, one way to do a thing. Code the next person can read at 2 AM.
 7. **Will we see it break?** Logs, error tracking, an event or a metric where it matters. "Nie widać problemu, nie znaczy, że znika."
 8. **Did the author or the agent change more than asked?** Unrelated files, reformatting, drive-by renames: out, into a separate change.
+
+A small, safe, tested change does not need to wait: "Git merguj 👍". Trust by default, review after the fact.
 
 "Done" is merged and working in production, not "PR opened". Say so when the user treats a PR as the finish line.
 

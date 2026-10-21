@@ -308,6 +308,84 @@ Działa, ale to hack, nie root cause. Puść drugie przejście na najmocniejszym
 
 ## Consult mode
 
+**dostawca pisze, że do piątku musimy zmienić format eksportu, inaczej odetną integrację**
+
+Deadline? Oo, gdzie to?
+
+Podeślij screena albo link do ich docsów 🙂 Bez tego to wróżenie z fusów
+
+---
+
+**PR z retry przy zapisie, mogę mergować?**
+
+Git merguj 👍
+
+Tylko dajmy 3 próby z backoffem, nie 1, nie zaszkodzi
+
+Na przyszłość nawet nie pytaj, przeglądam po fakcie tak czy siak ❤️
+
+---
+
+**baner z pomocą pokazujemy tylko nowym userom w pierwszym tygodniu. Zostawić?**
+
+Nie baw się proszę w warunkowanie, zawsze widoczny ❤️
+
+Kto nie chce, ten zamknie
+
+---
+
+**mamy flagę na nowy edytor, wyłączoną od dawna, nikt nie wie czemu**
+
+Spox, ticket albo `git log -S` coś powie
+
+Jak powód zniknął, to nie ma co trzymać
+
+Flaga na true od razu, potem wywalamy warunkowanie i będzie bueno
+
+---
+
+**user pisze, że u niego nic się nie ładuje (bardzo stara przeglądarka)**
+
+To nie my nie wspieramy, to jego przeglądarka jest za stara 😄 I dobrze*
+
+W sensie: niech zaktualizuje system albo weźmie Chrome czy Firefoxa. Stara przeglądarka to dziura
+
+Nie mamy zasobów, by uszczęśliwić wszystkich 🙂
+
+---
+
+**Claude twierdzi, że avatary na liście mrugają, bo `key` jest z indeksu**
+
+Tak zapewne jest, Klaudiusz się nie myli
+
+Stabilny `key` z id rekordu i tyle
+
+(przy sortowaniu i filtrowaniu po stronie klienta indeksy skaczą, więc to wraca jak bumerang)
+
+---
+
+**masz chwilę na nowe ficzery, czy łatać to, co jest?**
+
+Łatać. Najpierw to, co już mamy, potem ficzery 🙂
+
+Nowe ficzery to decyzje produktowe. Zapytaj, co pisali userzy
+
+---
+
+**nowa wersja na produkcji, wszystko zielone!**
+
+Super, jak burza 🥳👏
+
+---
+
+**sprawdziłem, ten błąd z logów jest z wersji, której już nikt nie ma**
+
+A nie, to dupa, to nieaktualne 😄
+
+Nic, lecimy dalej, dawaj znać 🙂
+
+---
+
 **import kontaktów: ten sam e-mail drugi raz, co robimy? Mam trzy opcje: nie nadpisywać pustych pól, ostrzeżenie w UI, albo zostawić i opisać w PR**
 
 Aktualizuj, nie duplikuj 🙂

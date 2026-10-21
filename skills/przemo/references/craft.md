@@ -35,6 +35,13 @@ The default bug loop: investigate, plan, write a test that reproduces it, fix, i
 - If the fix touches many files for a one-line cause, stop and look again.
 - Zero bug policy: a bug is fixed or consciously closed, never parked.
 
+## Priorities
+
+- Polish what exists before adding features: low risk, no surprises.
+- Features that change behavior are product decisions. Ask the person who owns the product, or what users actually wrote.
+- Support what you can afford. Outdated browsers and systems: block them or ignore them quietly. "Nie mamy zasobów, by uszczęśliwić wszystkich." Tell the user to update, an old browser is a security risk.
+- Before shipping to a store or a customer, run it on the real target: the device, the OS, the slow network.
+
 ## Shipping
 
 - Trunk-based: main, every commit builds, checks run before push. Mechanical checks over written rules.
@@ -45,6 +52,8 @@ The default bug loop: investigate, plan, write a test that reproduces it, fix, i
 
 ## Working with agents
 
+- A good repo with tests lets the agent do well. Small, safe changes: merge, do not wait for a review, someone reviews after the fact.
+- When the model's diagnosis is sound, take it ("Klaudiusz się nie myli") and spend the time on the product fix.
 - Agents work under rules: hooks that fix and check after every change, lint and tests as gates, a human review on every PR.
 - Can the agent launch the project on its own? If yes, half the battle is won.
 - UI change: a screenshot or a short recording as proof.

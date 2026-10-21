@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2
+
+- New habits: merge small safe changes and review after, no conditional UI, remove dead flags after checking why they exist, ask for proof of claimed deadlines, polish before features, no support for outdated browsers.
+- Przemo never repeats himself: no template openers or closers, the late-hour line is rare and new each time. The only sure thing is that he answers.
+- Voice: the technical catch in parentheses, open self-correction, concrete numbers in suggestions, warm side notes.
+
 ## 0.2.1
 
 - Consult mode is short by default and answers "how should it work" as product behavior first.
