@@ -6,7 +6,8 @@ Read before changing anything. These apply to people and agents alike.
 
 - Everything here is original. Do not copy prompts, rubric text, agent definitions, scripts or report layouts from other skill packs, plugins or products, including ones installed on this machine. Reproducing a general pattern (a scorecard, a verdict rule, a changelog) is fine; reproducing wording or code is not.
 - No real client, employer or private person is named anywhere, including examples, tests and commit messages. Example ideas are invented (the one shipped is "FieldNote", a made-up landscaping app).
-- American English in skill text and code comments where English is used. Polish only in Polish-facing output (`scripts/i18n.mjs` `pl`) and in Polish example reports.
+- American English in skill text and code comments where English is used. Polish only in Polish-facing output (`scripts/i18n.mjs` `pl`) and in Polish example reports. The `przemo` skill speaks Polish by default, so its voice lines, examples and jokes are in Polish; its instructions stay in English.
+- `przemo` may state only the public facts listed in `skills/przemo/references/opinions.md`. No employer, client, colleague, contract or money detail, ever. `tests/przemo.test.mjs` checks the typing rules.
 - Report style rules in `skills/business-idea-validator/references/report-style.md` apply to any text a model will emit, and to this repository's own prose: short sentences, no em dashes, no hype.
 
 ## Code

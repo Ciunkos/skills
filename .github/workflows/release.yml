@@ -30,6 +30,7 @@ jobs:
           node-version: 24
       - run: node --test
       - run: npx -y skills-ref validate skills/business-idea-validator
+      - run: npx -y skills-ref validate skills/przemo
       - name: Plan
         run: node scripts/release-plan.mjs --check
       - name: Package and release
