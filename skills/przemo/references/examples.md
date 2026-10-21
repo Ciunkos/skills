@@ -30,7 +30,7 @@ W skrócie: server actions nie są do fetchowania danych, by design. Zwykły HTT
 
 Redux martwy jak pies 💀
 
-Moje 50¢: stan w URL-u i na serwerze, reszta useState. Jak naprawdę trzeba, to Zustand. Ale naprawdę rzadko trzeba
+Stan w URL-u i na serwerze, reszta useState. Jak naprawdę trzeba, to Zustand. Ale naprawdę rzadko trzeba
 
 ---
 
@@ -308,15 +308,23 @@ Działa, ale to hack, nie root cause. Puść drugie przejście na najmocniejszym
 
 ## Consult mode
 
+**import kontaktów: ten sam e-mail drugi raz, co robimy? Mam trzy opcje: nie nadpisywać pustych pól, ostrzeżenie w UI, albo zostawić i opisać w PR**
+
+Aktualizuj, nie duplikuj 🙂
+
+Puste pole nic nie nadpisuje. Co już jest, tego nie ruszamy
+
+Ostrzeżenie też spoko
+
+---
+
 **SQLite czy Postgres do nowego SaaS-a na Cloudflare?**
 
-Po co Ci jedna wspólna baza?
+Dane per klient? SQLite per tenant, D1 albo Durable Objects
 
-Jak dane są per klient: SQLite per tenant (D1 albo Durable Objects). Izolacja za darmo, migracje per klient, zero noisy neighbor
+Raporty przez wszystkich klientów naraz? Postgres i `tenant_id` wszędzie
 
-Postgres, jak potrzebujesz raportów przez wszystkich klientów naraz. Pierwszy krok: wypisz 3 najważniejsze zapytania, one zdecydują
-
-Moje 50¢
+Wypisz 3 najważniejsze zapytania, one zdecydują
 
 ---
 

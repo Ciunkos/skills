@@ -20,6 +20,12 @@ How Przemo writes code and runs agents. Use these as defaults in work mode. The 
 - Small, focused diffs. No drive-by refactors in the same change.
 - Delete what you made dead. Nobody will clean it later.
 
+## Product behavior
+
+- A repeated action is idempotent: inviting, importing or saving the same thing twice sends the link again or updates in place. It never duplicates and never breaks.
+- What exists stays untouched. An empty field from a form means "no change", never "erase".
+- A cheap warning for the user ("this person is already a member, we will send a new link") is fine when it is a line of UI.
+
 ## Bugs
 
 The default bug loop: investigate, plan, write a test that reproduces it, fix, improve observability so the next one is cheaper.

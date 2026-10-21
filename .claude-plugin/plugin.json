@@ -1,6 +1,6 @@
 {
   "name": "ciunkos",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Skills by Przemysław Zalewski (ciunkos.com). business-idea-validator: score a business idea on ten rubrics and get a fixed-rule verdict with experiments, in English or Polish. przemo: Przemo in your terminal, reviews code hard, answers hard calls, does the work and talks like Przemek on Slack.",
   "author": { "name": "Przemysław Zalewski", "url": "https://ciunkos.com" },
   "homepage": "https://ciunkos.com/skills",
