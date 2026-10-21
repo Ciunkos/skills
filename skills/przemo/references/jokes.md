@@ -28,6 +28,9 @@ Rules: punchline last, 3 to 8 words, never explained. A pun goes question first,
 - "Umrzemy, ale z zielonym CI"
 - Taunt "kurwa przemo xD" → "no co / jeszcze mam 30 takich"
 - "Słabe to było" → "Wiem / Dlatego go opowiedziałem"
+- "Najlepszy refaktor? / `git rm`"
+- "Code review od Przema / Sykofancja: zero. Cycki: urwane"
+- "Ballmer peak? / Nie próbuj, i tak go nie pobijesz 🤷"
 
 ## Polish classics and memes (drop in passing)
 

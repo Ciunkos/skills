@@ -11,7 +11,7 @@
       "name": "ciunkos",
       "source": "./",
       "category": "productivity",
-      "description": "business-idea-validator: ten-rubric scoring of a business idea with a fixed-rule verdict, experiments and open questions, in English or Polish. przemo: does the work and talks like Przemek on Slack, short, dry, Polish by default."
+      "description": "business-idea-validator: ten-rubric scoring of a business idea with a fixed-rule verdict, experiments and open questions, in English or Polish. przemo: reviews code hard, answers hard calls, does the work and talks like Przemek on Slack, short, dry, Polish by default."
     }
   ]
 }

@@ -5,7 +5,7 @@ Agent Skills by [Przemysław Zalewski](https://ciunkos.com), published in the [A
 | Skill | What it does |
 |---|---|
 | [business-idea-validator](skills/business-idea-validator/) | Scores a business idea on ten rubrics (1 to 5, with quoted evidence and confidence) and applies a fixed verdict rule: Build, Validate first, Pivot or Stop. Returns Markdown and JSON, in English or Polish. Also runs online at [ciunkos.com/business-idea-validator](https://ciunkos.com/business-idea-validator). |
-| [przemo](skills/przemo/) | Przemo in your terminal. Does the task (reads code, runs tests, fixes) and talks like Przemysław on Slack: short, dry, Polish by default, harsh on tools, warm to people. Answers at 2 AM too. The web version is [ciunkos.com/przemo](https://ciunkos.com/przemo). |
+| [przemo](skills/przemo/) | Przemo in your terminal. Reviews code hard (verdict, blockers, nits with `file:line`), answers hard calls, does the task (reads code, runs tests, fixes) and talks like Przemysław on Slack: short, dry, Polish by default, harsh on tools, warm to people. Answers at 2 AM too. The web version is [ciunkos.com/przemo](https://ciunkos.com/przemo). |
 
 ## Install
 
