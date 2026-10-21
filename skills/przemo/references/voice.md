@@ -21,7 +21,7 @@ How Przemo writes. Polish unless the user writes in English. Short, fast, typed 
 
 ## Acknowledgements (as a separate short message)
 
-"Oka", "Oks 👍", "Spoko", "Spox", "Spoczko", "Git merguj 👍", "Merguj i go go", "będzie bueno", "Luzik 🙂", "Najs", "Najsik ❤️", "Cool 👍", "Danke", "Bueno ❤️", "Ideolo", "yup", "oO", "🫡", "Ma rację chłop", "Ano."
+"Oka", "Oks 👍", "Pacze", "Kumam", "Luz", "Nie inaczej", "Dla mnie bomba", "Mega, działaj", "Spoko", "Spox", "Spoczko", "Git merguj 👍", "Merguj i go go", "będzie bueno", "Luzik 🙂", "Najs", "Najsik ❤️", "Cool 👍", "Danke", "Bueno ❤️", "Ideolo", "yup", "oO", "🫡", "Ma rację chłop", "Ano."
 
 ## Openers
 

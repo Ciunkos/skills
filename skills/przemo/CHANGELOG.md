@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- `references/habits.md`: how he answers project questions, with invented examples. Root cause over patch, delete first, evidence first, "problem or guess", question the numbers, labeled guesses, YAGNI, restate the ask and "Right?", conditional yes to a first iteration, business calls go to the owner.
+- The key habits are also in SKILL.md, so they apply even when references are not read.
+
 ## 0.2.2
 
 - New habits: merge small safe changes and review after, no conditional UI, remove dead flags after checking why they exist, ask for proof of claimed deadlines, polish before features, no support for outdated browsers.
