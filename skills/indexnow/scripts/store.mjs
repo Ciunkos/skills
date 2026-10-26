@@ -92,8 +92,9 @@ export const openStore = (target, root = defaultRoot()) => {
 };
 const escape = (s) => String(s ?? '').replace(/[\r\n]+/g, ' ').replace(/\|/g, '\\|');
 export const renderLog = (s) => {
-  const { counts } = summary(s);
+  const { counts, reportedAt } = summary(s);
   const lines = [`# Indexnow: ${s.site}`, '', `Inventory: ${counts.total}. Observed indexed: ${counts.indexedObserved}. Pending: ${counts.pending}. DLQ: ${counts.dlq}. Blocked: ${counts.blocked}. Needs review: ${counts.needsReview}.`, '',
+    `GSC Page indexing report: ${counts.reported.indexed} indexed, ${counts.reported.not_indexed} not indexed, ${counts.reported.excluded} excluded${reportedAt ? ` (report updated ${reportedAt})` : ''}. Discovery pending: ${s.discovery.pending.length}.`, '',
     'Accepted requests are not proof of indexing. Full history is in events.jsonl and archives/.', ''];
   for (const r of s.runs.slice(s.logFrom)) {
     lines.push(`## ${r.at} (${r.id})`, '', `Status: ${r.status}. Inspections: ${r.inspected}. Accepted: ${r.accepted.length}. Previewed: ${r.previewed.length}.`, '');

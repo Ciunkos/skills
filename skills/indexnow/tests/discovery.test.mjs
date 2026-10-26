@@ -9,6 +9,9 @@ test('sitemap parsing handles namespaces, CDATA, entities, alternates, and image
   const xml = `<?xml version="1.0"?><sm:urlset xmlns:sm="urn:sitemap" xmlns:image="urn:image" xmlns:xhtml="urn:xhtml"><sm:url><sm:loc><![CDATA[https://example.com/pricing?a=1&b=2]]></sm:loc><image:image><image:loc>https://example.com/photo.jpg</image:loc></image:image><xhtml:link hreflang="pl" href="https://example.com/pl/cennik" /></sm:url><sm:url><sm:loc>https://example.com/search?a=1&amp;b=2</sm:loc></sm:url></sm:urlset>`;
   const parsed = parseSitemap(xml, 'https://example.com');
   assert.deepEqual(parsed.urls, ['https://example.com/pricing?a=1&b=2', 'https://example.com/search?a=1&b=2']);
+  assert.deepEqual(parsed.entries.map((e) => e.lastmod), [null, null]);
+  const dated = parseSitemap('<urlset><url><loc>https://example.com/a</loc><lastmod>2026-01-02</lastmod></url><url><lastmod>not a date</lastmod><loc>https://example.com/b</loc></url></urlset>', 'https://example.com');
+  assert.deepEqual(dated.entries, [{ url: 'https://example.com/a', lastmod: '2026-01-02T00:00:00.000Z' }, { url: 'https://example.com/b', lastmod: null }]);
   assert.deepEqual(parsed.alternates, [{ url: 'https://example.com/pl/cennik', language: 'pl' }]);
   assert.throws(() => parseSitemap('<!DOCTYPE x><urlset/>'), /DTDs/);
   assert.throws(() => parseSitemap('<html>error</html>'), /sitemap/);
@@ -57,6 +60,10 @@ test('nested and gzip sitemaps resume across batches without following cycles or
     s = JSON.parse(JSON.stringify(s));
   }
   assert.ok(s.pages['https://example.com/pricing']);
+  assert.equal(requests.some((x) => x.endsWith('/pricing')), false, 'sitemap pages are registered, not fetched');
+  assert.equal(s.discovery.sitemapPages, 1);
+  send('discovered', { runId: 'r', ...await discover(s, { url: 'https://example.com/pricing', kind: 'page' }) });
+  assert.equal(s.pages['https://example.com/pricing'].httpStatus, 200);
   assert.equal(s.settings.primaryLanguage, 'en');
   assert.equal(s.discovery.failures.length, 0);
   assert.equal(requests.filter((x) => x.endsWith('/maps.xml')).length, 1);

@@ -97,3 +97,27 @@ test('installed skill CLI works through a symlink and status creates no working 
   assert.equal(JSON.parse(output).counts.total, 0);
   assert.equal(existsSync(join(root, 'example.com')), false);
 });
+
+test('CLI seeds from a GSC report, skips other hosts, reads an unzipped export, and fetches named candidates', async (t) => {
+  const { root } = workspace(t), preferences = join(root, 'prefs.json'), input = join(root, 'input.json'), csv = join(root, 'Table.csv');
+  const fetcher = async (url) => new Response(url.endsWith('/robots.txt') ? '' : '<html lang="en"><main>New page</main></html>', { headers: { 'content-type': url.endsWith('/robots.txt') ? 'text/plain' : 'text/html' } });
+  const call = async (command, data, runId, extra = []) => {
+    writeFileSync(input, JSON.stringify(data));
+    return main([command, 'example.com', '--storage', root, '--input', input, ...(runId ? ['--run', runId] : []), ...extra], { preferences, fetcher });
+  };
+  const { runId } = await call('start', {});
+  const report = await call('report', { status: 'not_indexed', reason: 'Discovered - currently not indexed', reportedAt: '2026-01-01T00:00:00Z', items: [{ url: 'https://example.com/new' }, { url: 'https://sso.example.com/login' }, { url: 'not a url' }] }, runId);
+  assert.equal(report.imported, 1); assert.equal(report.skipped, 2);
+  writeFileSync(csv, 'URL,Last crawled\n"https://example.com/csv-page","Jan 1, 2026"\n,\n');
+  const fromCsv = await call('report', { status: 'indexed', reportedAt: '2026-01-01T00:00:00Z', csv }, runId);
+  assert.equal(fromCsv.imported, 1);
+  assert.deepEqual(fromCsv.counts.reported, { indexed: 1, not_indexed: 1, excluded: 0 });
+  const next = await call('next', {}, runId);
+  assert.deepEqual(next.actions.map((a) => a.url), ['https://example.com/new']);
+  await assert.rejects(() => call('fetch', { urls: [] }, runId), /urls/);
+  const fetched = await call('fetch', { urls: ['https://example.com/new'] }, runId);
+  assert.equal(fetched.fetched, 1); assert.equal(fetched.pages[0].url, 'https://example.com/new');
+  assert.equal(fetched.pages[0].httpStatus, 200); assert.equal(fetched.pages[0].indexable, true);
+  assert.equal((await call('next', {}, runId)).actions[0].fetchedAt !== null, true);
+  assert.match(readFileSync(join(root, 'example.com', 'log.md'), 'utf8'), /1 indexed, 1 not indexed, 0 excluded/);
+});

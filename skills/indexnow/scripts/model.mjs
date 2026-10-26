@@ -10,8 +10,8 @@ export const siteName = (target) => new URL(normalizeUrl(target.includes('://') 
 export const inScope = (state, url) => siteName(url) === state.site;
 export const createState = (target) => ({
   version: 1, seq: 0, site: siteName(target), origin: new URL(normalizeUrl(target.includes('://') ? target : `https://${target}`)).origin,
-  settings: { property: null, primaryLanguage: null }, pages: {}, hints: [], runs: [], currentRun: null,
-  discovery: { pending: [], fetched: {}, fetchedInRun: {}, failures: [] }, logFrom: 0,
+  settings: { property: null, primaryLanguage: null, crawlLinks: false }, pages: {}, hints: [], runs: [], currentRun: null,
+  discovery: { pending: [], fetched: {}, fetchedInRun: {}, failures: [], sitemapPages: 0 }, logFrom: 0,
 });
 const requireText = (value, label) => {
   if (typeof value !== 'string' || !value.trim()) throw new Error(`${label} requires nonempty text`);
@@ -38,7 +38,7 @@ const ensurePage = (s, value, at, source = 'input') => {
   const p = s.pages[url] ||= {
     url, firstSeen: at, eligibleSince: at, sources: [], language: null, alternates: [], title: '',
     businessValue: 1, valueReason: 'Unassessed', indexable: null, blockedReason: null,
-    contentHash: null, contentPreview: '', changeCandidate: null, inspection: null,
+    contentHash: null, contentPreview: '', changeCandidate: null, inspection: null, lastmod: null, report: null,
     everObservedIndexed: false, lifetimeAccepted: 0, hintIds: [], pending: null, lastOutcome: null,
     cycle: { id: 0, key: null, changedAt: null, reason: null, accepted: [], nextActionAt: at, status: 'queued' },
   };
@@ -51,12 +51,15 @@ const enqueue = (s, value, kind, at, force = false) => {
   const seen = s.discovery.fetched[`${kind}:${url}`];
   if (!force && kind === 'page' && seen && date(at) - date(seen) < 7 * DAY) return;
   if (!force && kind !== 'page' && s.discovery.fetchedInRun[`${kind}:${url}`] === s.currentRun) return;
-  if (!s.discovery.pending.some((x) => x.url === url && x.kind === kind)) s.discovery.pending.push({ url, kind });
+  if (s.discovery.pending.some((x) => x.url === url && x.kind === kind)) return;
+  /* Sitemaps and robots go first so link crawling can be skipped once the sitemap covers the site. */
+  if (kind === 'page') s.discovery.pending.push({ url, kind }); else s.discovery.pending.unshift({ url, kind });
 };
+const activeHint = (s, p) => p.hintIds.some((id) => s.hints.some((h) => h.id === id && !h.resolvedAt));
+const freshReport = (p, now) => p.report && date(now) - date(p.report.at) < 7 * DAY ? p.report : null;
 export const score = (s, p, now) => {
-  const activeHint = p.hintIds.some((id) => s.hints.some((h) => h.id === id && !h.resolvedAt));
   const parts = {
-    hint: activeHint ? 100 : 0, change: p.cycle.changedAt ? 40 : 0,
+    hint: activeHint(s, p) ? 100 : 0, change: p.cycle.changedAt ? 40 : 0, reported: p.report?.status === 'not_indexed' ? 50 : 0,
     unsubmitted: p.lifetimeAccepted === 0 ? 30 : 0, value: p.businessValue * 10,
     language: p.language && s.settings.primaryLanguage && p.language.toLowerCase() === s.settings.primaryLanguage.toLowerCase() ? 10 : 0,
     waiting: Math.max(0, Math.floor((date(now) - date(p.eligibleSince)) / DAY)),
@@ -69,6 +72,9 @@ const actionFor = (s, p, run, now) => {
   if (run.deferred.includes(p.url) || run.previewed.includes(p.url) || p.lastOutcome?.runId === run.id) return null;
   if (date(p.cycle.nextActionAt) > date(now)) return null;
   if (p.cycle.status === 'complete' && p.inspection && date(now) - date(p.inspection.at) < 7 * DAY) return null;
+  const report = freshReport(p, now), quiet = !activeHint(s, p) && !p.cycle.changedAt;
+  if (report?.status === 'indexed' && quiet && p.cycle.status !== 'pending') return null;
+  if (report?.status === 'excluded' && quiet && !(p.indexable === true && s.discovery.fetched[`page:${p.url}`] && date(s.discovery.fetched[`page:${p.url}`]) > date(report.at))) return null;
   if (p.inspection?.runId !== run.id) return 'inspect';
   if (p.inspection.indexed === null || p.cycle.status === 'complete' || p.cycle.accepted.length >= 3) return null;
   if (p.cycle.changedAt && p.inspection.indexed && !p.inspection.lastCrawlAt) return null;
@@ -80,13 +86,15 @@ export const queue = (s, runId, now, take = 20) => {
   if (!run || s.currentRun !== runId || run.status !== 'active') return [];
   return Object.values(s.pages).flatMap((p) => {
     const action = actionFor(s, p, run, now);
-    return action ? [{ url: p.url, action, score: score(s, p, now), eligibleSince: p.eligibleSince, title: p.title, language: p.language, valueReason: p.valueReason, cycle: p.cycle, inspection: p.inspection }] : [];
+    return action ? [{ url: p.url, action, score: score(s, p, now), eligibleSince: p.eligibleSince, title: p.title, language: p.language, valueReason: p.valueReason, cycle: p.cycle, inspection: p.inspection, report: p.report, fetchedAt: s.discovery.fetched[`page:${p.url}`] || null }] : [];
   }).sort((a, b) => b.score.total - a.score.total || a.eligibleSince.localeCompare(b.eligibleSince) || a.url.localeCompare(b.url)).slice(0, take);
 };
 export const summary = (s) => {
-  const counts = { total: 0, indexedObserved: 0, pending: 0, dlq: 0, blocked: 0, needsReview: 0, queued: 0 };
+  const counts = { total: 0, indexedObserved: 0, pending: 0, dlq: 0, blocked: 0, needsReview: 0, queued: 0, reported: { indexed: 0, not_indexed: 0, excluded: 0 } };
+  let reportedAt = null;
   for (const p of Object.values(s.pages)) {
     counts.total++;
+    if (p.report) { counts.reported[p.report.status]++; if (!reportedAt || p.report.reportedAt > reportedAt) reportedAt = p.report.reportedAt; }
     if (p.inspection?.indexed) counts.indexedObserved++;
     if (p.pending) counts.needsReview++;
     if (p.blockedReason) counts.blocked++;
@@ -97,7 +105,7 @@ export const summary = (s) => {
     acceptedCount: last.accepted.length, accepted: last.accepted.slice(-20), previewedCount: last.previewed.length,
     errorCount: last.errors.length, errors: last.errors.slice(-20), dlqCount: last.dlq.length, dlq: last.dlq.slice(-20), observations: last.observations.slice(-20), quota: last.quota, note: last.note,
   } : null;
-  return { site: s.site, settings: s.settings, counts, discoveryRemaining: s.discovery.pending.length, currentRun: s.currentRun, latestRun, unresolvedHints: s.hints.filter((h) => !h.resolvedAt) };
+  return { site: s.site, settings: s.settings, counts, reportedAt, discoveryRemaining: s.discovery.pending.length, currentRun: s.currentRun, latestRun, unresolvedHints: s.hints.filter((h) => !h.resolvedAt) };
 };
 export const applyEvent = (state, event) => {
   const s = structuredClone(state), d = event.data || {}, at = event.at;
@@ -109,14 +117,15 @@ export const applyEvent = (state, event) => {
       if (s.runs.some((r) => r.id === d.id)) throw new Error('Run ID already exists');
       s.runs.push({ id: requireText(d.id, 'Run ID'), at, status: 'active', dryRun: !!d.dryRun, accepted: [], errors: [], dlq: [], observations: [], inspected: 0, previewed: [], deferred: [] });
       s.currentRun = d.id;
+      /* A run starts from robots.txt and sitemaps. Known pages are not refetched in bulk; fetch candidates individually. */
+      s.discovery.pending = [];
       enqueue(s, `${s.origin}/robots.txt`, 'robots', at);
-      enqueue(s, `${s.origin}/`, 'page', at, true);
-      for (const p of Object.values(s.pages)) enqueue(s, p.url, 'page', at);
       break;
     }
     case 'configure': {
       runFor(s, d.runId);
       for (const key of ['property', 'primaryLanguage']) if (key in d) s.settings[key] = requireText(d[key], key);
+      if ('crawlLinks' in d) { if (typeof d.crawlLinks !== 'boolean') throw new Error('crawlLinks must be true or false'); s.settings.crawlLinks = d.crawlLinks; }
       break;
     }
     case 'import': {
@@ -159,6 +168,18 @@ export const applyEvent = (state, event) => {
       if ('significant' in d) p.changeCandidate = null;
       break;
     }
+    case 'report': {
+      const r = runFor(s, d.runId);
+      if (!['indexed', 'not_indexed', 'excluded'].includes(d.status)) throw new Error('status must be indexed, not_indexed, or excluded');
+      if (d.status !== 'indexed') requireText(d.reason, 'GSC reason');
+      date(d.reportedAt);
+      for (const item of d.items || []) {
+        if (item.lastCrawlAt) date(item.lastCrawlAt);
+        const p = ensurePage(s, item.url, at, `gsc:${d.status}`);
+        p.report = { status: d.status, reason: d.reason || null, lastCrawlAt: item.lastCrawlAt || null, reportedAt: d.reportedAt, at, runId: r.id };
+      }
+      break;
+    }
     case 'discovered': {
       runFor(s, d.runId);
       const { url, kind } = d.task;
@@ -167,8 +188,17 @@ export const applyEvent = (state, event) => {
       s.discovery.fetched[`${kind}:${url}`] = at;
       s.discovery.fetchedInRun[`${kind}:${url}`] = s.currentRun;
       if (d.error) s.discovery.failures.push({ url, kind, at, error: d.error });
-      for (const task of d.tasks || []) enqueue(s, task.url, task.kind, at);
-      for (const item of d.pages || []) ensurePage(s, item.url, at, item.source || url);
+      if (kind === 'robots') enqueue(s, `${s.origin}/`, 'page', at, true);
+      if (kind === 'sitemap') s.discovery.sitemapPages = (s.discovery.sitemapPages || 0) + (d.pages || []).length;
+      const followLinks = kind !== 'page' || s.settings.crawlLinks === true || !(s.discovery.sitemapPages > 0);
+      for (const task of d.tasks || []) if (task.kind !== 'page' || followLinks) enqueue(s, task.url, task.kind, at);
+      for (const item of d.pages || []) {
+        const p = ensurePage(s, item.url, at, item.source || url);
+        if (item.lastmod && (!p.lastmod || date(item.lastmod) > date(p.lastmod))) {
+          if (p.lastmod) p.changeCandidate = { before: p.lastmod, after: item.lastmod, at, reason: 'Sitemap lastmod advanced; assess significance' };
+          p.lastmod = item.lastmod;
+        }
+      }
       if (d.page) {
         const p = ensurePage(s, d.page.url, at, url), oldHash = p.contentHash, wasIndexable = p.indexable, beforePreview = p.contentPreview;
         for (const key of ['title', 'language', 'alternates', 'contentHash', 'contentPreview', 'indexable', 'blockedReason', 'canonical', 'httpStatus']) if (key in d.page) p[key] = d.page[key];

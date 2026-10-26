@@ -1,4 +1,4 @@
-/* Public sitemap and page discovery. No Google API calls or browser credentials. */
+/* Public sitemap and page discovery. Sitemaps register pages; single pages are fetched on request. No Google API calls or browser credentials. */
 import { createHash } from 'node:crypto';
 import { gunzipSync } from 'node:zlib';
 import { normalizeUrl, inScope } from './model.mjs';
@@ -14,12 +14,12 @@ const safeUrl = (raw, base) => { if (typeof raw !== 'string' || !raw.trim()) ret
 
 export const parseSitemap = (xml, base) => {
   if (/<!DOCTYPE|<!ENTITY/i.test(xml)) throw new Error('Sitemap DTDs and entity declarations are unsupported');
-  const stack = [], urls = [], sitemaps = [], alternates = [];
-  let loc = '', root = null;
+  const stack = [], urls = [], sitemaps = [], alternates = [], entries = [];
+  let loc = '', lastmod = '', root = null, entry = null;
   for (const token of xml.match(/<!\[CDATA\[[\s\S]*?\]\]>|<!--[\s\S]*?-->|<[^>]*>|[^<]+/g) || []) {
     if (token.startsWith('<!--') || token.startsWith('<?')) continue;
-    if (token.startsWith('<![CDATA[')) { if (stack.at(-1)?.local === 'loc') loc += token.slice(9, -3); continue; }
-    if (!token.startsWith('<')) { if (stack.at(-1)?.local === 'loc') loc += decode(token); continue; }
+    if (token.startsWith('<![CDATA[')) { if (stack.at(-1)?.local === 'loc') loc += token.slice(9, -3); if (stack.at(-1)?.local === 'lastmod') lastmod += token.slice(9, -3); continue; }
+    if (!token.startsWith('<')) { if (stack.at(-1)?.local === 'loc') loc += decode(token); if (stack.at(-1)?.local === 'lastmod') lastmod += decode(token); continue; }
     const closing = /^<\//.test(token), selfClosing = /\/>$/.test(token);
     const name = /^<\/?\s*([\w:.-]+)/.exec(token)?.[1];
     if (!name) continue;
@@ -29,13 +29,16 @@ export const parseSitemap = (xml, base) => {
       if (!top || top.name !== name) throw new Error('Malformed sitemap XML');
       if (local === 'loc' && prefix === root?.prefix && stack.at(-1)?.prefix === prefix) {
         const url = safeUrl(loc.trim(), base);
-        if (url && stack.at(-1)?.local === 'url') urls.push(url);
+        if (url && stack.at(-1)?.local === 'url') { urls.push(url); entry = { url, lastmod: null }; }
         if (url && stack.at(-1)?.local === 'sitemap') sitemaps.push(url);
       }
+      if (local === 'lastmod' && stack.at(-1)?.local === 'url' && entry && Number.isFinite(Date.parse(lastmod.trim()))) entry.lastmod = new Date(lastmod.trim()).toISOString();
+      if (local === 'url') { if (entry) entries.push(entry); entry = null; }
       continue;
     }
     root ||= { prefix, local };
     if (local === 'loc') loc = '';
+    if (local === 'lastmod') lastmod = '';
     if (local === 'link' && stack.at(-1)?.local === 'url') {
       const a = attrs(token), url = safeUrl(a.href, base);
       if (url && a.hreflang) alternates.push({ url, language: a.hreflang });
@@ -43,7 +46,7 @@ export const parseSitemap = (xml, base) => {
     if (!selfClosing) stack.push({ name, prefix, local });
   }
   if (stack.length || !['urlset', 'sitemapindex'].includes(root?.local)) throw new Error('Expected a complete sitemap urlset or sitemapindex');
-  return { urls: [...new Set(urls)], sitemaps: [...new Set(sitemaps)], alternates };
+  return { urls: [...new Set(urls)], sitemaps: [...new Set(sitemaps)], alternates, entries };
 };
 
 export const parseRobots = (text) => {
@@ -131,9 +134,10 @@ export const makeDiscoverer = ({ fetcher = fetch, version = '0.1.0', maxBytes = 
       const r = await read(task.url, state, async (url) => robotsAllowed(await robotsFor(url, state), url));
       if (task.kind === 'sitemap') {
         if (r.status !== 200) throw new Error(`Sitemap HTTP ${r.status}`);
+        /* Sitemap entries are registered, not fetched. Candidates are fetched individually before inspection. */
         const map = parseSitemap(r.text, r.url);
-        result.tasks = [...map.sitemaps.map((url) => ({ url, kind: 'sitemap' })), ...map.urls.map((url) => ({ url, kind: 'page' })), ...map.alternates.map(({ url }) => ({ url, kind: 'page' }))].filter((x) => inScope(state, x.url));
-        result.pages = [...map.urls, ...map.alternates.map((x) => x.url)].filter((url) => inScope(state, url)).map((url) => ({ url, source: task.url }));
+        result.tasks = map.sitemaps.map((url) => ({ url, kind: 'sitemap' })).filter((x) => inScope(state, x.url));
+        result.pages = [...map.entries, ...map.alternates.map((x) => ({ url: x.url, lastmod: null }))].filter((x) => inScope(state, x.url)).map(({ url, lastmod }) => ({ url, lastmod, source: task.url }));
       } else {
         if (r.url !== task.url) {
           result.pages.push({ url: r.url, source: task.url }); result.tasks.push({ url: r.url, kind: 'page' });

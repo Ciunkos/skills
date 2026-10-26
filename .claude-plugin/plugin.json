@@ -1,6 +1,6 @@
 {
   "name": "ciunkos",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Skills by Przemysław Zalewski (ciunkos.com). business-idea-validator: score a business idea and get a fixed-rule verdict. przemo: reviews code, answers hard calls, and does the work. indexnow: prioritize Google Search Console indexing requests and persist retries, results, and a dead-letter queue.",
   "author": {
     "name": "Przemysław Zalewski",

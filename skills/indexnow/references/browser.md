@@ -10,6 +10,24 @@ Open Search Console and resolve the domain property (`sc-domain:example.com`) or
 
 Use the Sitemaps report to import submitted sitemap URLs into discovery. Report a missing or broken sitemap as a discovery issue. This skill does not change the website or register new sitemaps automatically.
 
+## Page indexing report
+
+Open Indexing, then Pages, for the resolved property. Note the date the report says it was last updated; pass it as `reportedAt`. The report is a sample that lags by days. It seeds the queue and never replaces an inspection, and a listed reason is not proof that a request was rejected.
+
+1. In the table of reasons why pages are not indexed, open each reason with a nonzero count. Set rows per page to the maximum and page through the table, or use Export and read the unzipped CSV with the `csv` input. GSC shows at most 1,000 rows per reason. Record each reason with one `report` call, with the exact reason label and `lastCrawlAt` in ISO form when the column is readable.
+2. Open the sample behind the indexed count (the link to view data about indexed pages) and record it as `indexed`.
+3. Rows from other hosts of a domain property are skipped by the helper; list them as gaps for a separate run.
+
+Map reasons to a status by meaning, reading labels in the user's language:
+
+| Status | GSC reasons |
+|---|---|
+| not_indexed | Crawled, currently not indexed; Discovered, currently not indexed |
+| excluded | Excluded by noindex tag; Alternate page with proper canonical tag; Duplicate without user-selected canonical; Duplicate, Google chose different canonical than user; Page with redirect; Redirect error; Blocked by robots.txt; Blocked due to unauthorized request (401); Blocked due to access forbidden (403); Not found (404); Server error (5xx); Soft 404 |
+| indexed | The indexed pages sample |
+
+Observed Polish labels include "Strona zeskanowana, ale jeszcze nie zindeksowana" for crawled, currently not indexed and "Alternatywna strona zawierająca prawidłowy tag strony kanonicznej" for the canonical alternate. An excluded page returns to the queue only after a hint, a significant revision, or a fresh `fetch` that finds it indexable. Browser-tab reading tools are fine here; the native sequence below applies to submission.
+
 ## Inspection evidence
 
 Use native Chrome controls to enter the fully qualified URL in the property's inspection field. Wait for indexed data to load. Capture:

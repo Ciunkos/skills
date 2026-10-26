@@ -32,7 +32,7 @@ Requirements: Node 20 or later, a writable directory, native Chrome window contr
 
 Default storage is `~/indexnow/<site>/`: structured state, an exact event journal, and a readable Markdown log. `--storage` selects another root and is remembered for that site. Keep the workspace accessible to future agent runs. Private working data stays outside this public skill.
 
-It discovers sitemaps and links, tracks canonical language versions separately, favors your main language, and ranks page value with reasons. A change hint can prioritize an already indexed page for refreshing. Fingerprints help find changes; an agent must judge whether they are significant.
+It seeds the queue from your sitemaps and the GSC Page indexing report, so pages Google lists as crawled or discovered but not indexed come first and pages it already indexed are left alone. Internal links are crawled only when a site has no sitemap. It tracks canonical language versions separately, favors your main language, and ranks page value with reasons. A change hint can prioritize an already indexed page for refreshing. Fingerprints help find changes; an agent must judge whether they are significant.
 
 After accepted requests it waits 3 days, then 7 days, then 14 days for the final observation. A page still unindexed after three accepted requests enters a dead-letter queue (DLQ). A significant content or indexability fix can open another cycle while preserving the full history. Changed indexed pages track crawl freshness separately. Google's acceptance is not proof of indexing.
 
@@ -46,7 +46,7 @@ Copyable scheduling prompt:
 
 ```text
 Use $indexnow to process example.com using its remembered storage, defaulting to ~/indexnow.
-Inspect due requests, discover and assess new or changed pages, and request indexing for eligible URLs.
+Seed from the Sitemaps and Page indexing reports first, inspect due requests, assess new or changed pages, and request indexing for eligible URLs.
 Continue until GSC displays an actual quota error or the eligible queue and discovery work are exhausted.
 Do not assume a daily request count or a reset time. Try again even if the previous run hit quota.
 Preserve submission history, retry timing, localized versions, and the DLQ.

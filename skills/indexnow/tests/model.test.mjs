@@ -1,7 +1,7 @@
 /* Observable queue behavior, including quota discovery and delayed indexing evidence. */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createState, applyEvent, queue, score, normalizeUrl } from '../scripts/model.mjs';
+import { createState, applyEvent, queue, score, summary, normalizeUrl } from '../scripts/model.mjs';
 
 const T = '2026-01-01T12:00:00.000Z', url = 'https://example.com/pricing';
 const day = (n) => new Date(Date.parse(T) + n * 86_400_000).toISOString();
@@ -150,4 +150,84 @@ test('indexing success after three requests completes that cycle; later deindexi
   assert.equal(f.state().pages[url].cycle.status, 'queued');
   assert.equal(f.state().pages[url].cycle.accepted.length, 0);
   assert.equal(f.state().pages[url].lifetimeAccepted, 3);
+});
+
+test('GSC Page indexing report seeds the queue: not indexed first, indexed and excluded pages skipped while fresh', () => {
+  const f = fixture(), map = 'https://example.com/sitemap.xml';
+  const pages = ['ignored', 'listed', 'alternate', 'missing'].map((x) => `https://example.com/${x}`);
+  f.send('discovered', { task: { url: map, kind: 'sitemap' }, pages: pages.map((url) => ({ url, lastmod: null, source: map })), tasks: [] });
+  f.send('report', { status: 'not_indexed', reason: 'Crawled - currently not indexed', reportedAt: day(-3), items: [{ url: pages[0], lastCrawlAt: day(-5) }] });
+  f.send('report', { status: 'indexed', reportedAt: day(-3), items: [{ url: pages[1] }, { url }] });
+  f.send('report', { status: 'excluded', reason: 'Alternate page with proper canonical tag', reportedAt: day(-3), items: [{ url: pages[2] }] });
+  assert.throws(() => f.send('report', { status: 'excluded', reportedAt: T, items: [] }), /reason/);
+  assert.throws(() => f.send('report', { status: 'maybe', reason: 'x', reportedAt: T, items: [] }), /status/);
+  const q = queue(f.state(), 'r1', T);
+  assert.deepEqual(q.map((a) => a.url), [pages[0], pages[3]]);
+  assert.equal(q[0].score.parts.reported, 50);
+  assert.equal(q[0].report.reason, 'Crawled - currently not indexed');
+  assert.equal(q[0].fetchedAt, null);
+  assert.equal(f.state().pages[pages[0]].sources.includes('gsc:not_indexed'), true);
+  f.send('hint', { id: 'h', text: 'Rewrote the listed page' });
+  f.send('assess', { url: pages[1], hintIds: ['h'] });
+  assert.ok(queue(f.state(), 'r1', T).some((a) => a.url === pages[1]));
+  f.send('discovered', { task: { url: pages[2], kind: 'page' }, page: { url: pages[2], httpStatus: 200, indexable: true, blockedReason: null }, pages: [], tasks: [] }, day(1));
+  assert.ok(queue(f.state(), 'r1', day(1)).some((a) => a.url === pages[2]));
+  assert.equal(queue(f.state(), 'r1', day(8)).some((a) => a.url === url), true);
+  assert.equal(f.state().pages[url].inspection, null);
+  const { counts, reportedAt } = summary(f.state());
+  assert.deepEqual(counts.reported, { indexed: 2, not_indexed: 1, excluded: 1 });
+  assert.equal(reportedAt, day(-3));
+});
+
+test('a report saying indexed still lets a pending cycle be observed and completed', () => {
+  const f = fixture(); f.inspect(); f.begin('a'); f.result('a');
+  f.send('finish', { reason: 'interrupted' }); f.start('r2', day(3));
+  f.send('report', { status: 'indexed', reportedAt: day(3), items: [{ url }] }, day(3));
+  assert.equal(queue(f.state(), 'r2', day(3))[0].action, 'inspect');
+  f.inspect(url, day(3), { indexed: true });
+  assert.equal(f.state().pages[url].cycle.status, 'complete');
+});
+
+test('a run starts from robots.txt; sitemaps register pages without fetch tasks; links are crawled only without a sitemap or on request', () => {
+  const f = fixture(), map = 'https://example.com/sitemap.xml', home = 'https://example.com/';
+  f.send('discovered', { task: { url: 'https://example.com/old', kind: 'page' }, pages: [], tasks: [] });
+  f.send('finish', { reason: 'interrupted' }); f.start('r2', day(1));
+  assert.deepEqual(f.state().discovery.pending, [{ url: 'https://example.com/robots.txt', kind: 'robots' }]);
+  f.send('discovered', { task: { url: 'https://example.com/robots.txt', kind: 'robots' }, tasks: [{ url: map, kind: 'sitemap' }] }, day(1));
+  assert.deepEqual(f.state().discovery.pending.map((x) => x.kind), ['sitemap', 'page']);
+  f.send('discovered', { task: { url: map, kind: 'sitemap' }, pages: [{ url: 'https://example.com/a', lastmod: day(-10), source: map }], tasks: [] }, day(1));
+  assert.equal(f.state().discovery.sitemapPages, 1);
+  assert.equal(f.state().pages['https://example.com/a'].lastmod, day(-10));
+  f.send('discovered', { task: { url: home, kind: 'page' }, pages: [{ url: 'https://example.com/b', source: home }], tasks: [{ url: 'https://example.com/b', kind: 'page' }] }, day(1));
+  assert.ok(f.state().pages['https://example.com/b']);
+  assert.deepEqual(f.state().discovery.pending, []);
+  f.send('configure', { crawlLinks: true });
+  f.send('discovered', { task: { url: 'https://example.com/a', kind: 'page' }, pages: [], tasks: [{ url: 'https://example.com/c', kind: 'page' }] }, day(1));
+  assert.deepEqual(f.state().discovery.pending, [{ url: 'https://example.com/c', kind: 'page' }]);
+  assert.throws(() => f.send('configure', { crawlLinks: 'yes' }), /crawlLinks/);
+  const g = fixture();
+  g.send('discovered', { task: { url: home, kind: 'page' }, pages: [], tasks: [{ url: 'https://example.com/linked', kind: 'page' }] });
+  assert.ok(g.state().discovery.pending.some((x) => x.url === 'https://example.com/linked'));
+});
+
+test('a newer sitemap lastmod becomes a change candidate for review, never a revision by itself', () => {
+  const f = fixture(), map = 'https://example.com/sitemap.xml';
+  const entry = (lastmod, at) => f.send('discovered', { task: { url: map, kind: 'sitemap' }, pages: [{ url, lastmod, source: map }], tasks: [] }, at);
+  entry(day(-10), T); assert.equal(f.state().pages[url].changeCandidate, null);
+  entry(day(-10), T); assert.equal(f.state().pages[url].changeCandidate, null);
+  entry(day(-1), T);
+  assert.match(f.state().pages[url].changeCandidate.reason, /lastmod/);
+  assert.equal(f.state().pages[url].cycle.changedAt, null);
+  f.send('assess', { url, significant: false });
+  assert.equal(f.state().pages[url].changeCandidate, null);
+});
+
+test('journals written before reports and sitemap-only discovery still replay', () => {
+  const f = fixture();
+  f.send('import', { items: [{ url: 'https://example.com/sitemap.xml', kind: 'sitemap' }] });
+  f.send('discovered', { task: { url: 'https://example.com/sitemap.xml', kind: 'sitemap' }, pages: [{ url: 'https://example.com/legacy', source: 'https://example.com/sitemap.xml' }], tasks: [{ url: 'https://example.com/legacy', kind: 'page' }] });
+  const legacy = structuredClone(f.state()); delete legacy.discovery.sitemapPages; delete legacy.settings.crawlLinks;
+  const next = applyEvent(legacy, { seq: legacy.seq + 1, type: 'discovered', at: T, data: { runId: 'r1', task: { url: 'https://example.com/legacy', kind: 'page' }, page: { url: 'https://example.com/legacy', httpStatus: 200, indexable: true }, pages: [], tasks: [{ url: 'https://example.com/more', kind: 'page' }] } });
+  assert.ok(next.pages['https://example.com/legacy']);
+  assert.deepEqual(queue(next, 'r1', T).map((a) => a.url).includes('https://example.com/legacy'), true);
 });
