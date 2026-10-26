@@ -1,7 +1,7 @@
 {
   "$schema": "https://code.claude.com/schemas/marketplace.json",
   "name": "ciunkos",
-  "description": "Skills by Przemysław Zalewski (ciunkos.com): business idea validation with a fixed-rule verdict, in English or Polish, and Przemo in your terminal.",
+  "description": "Skills by Przemysław Zalewski (ciunkos.com): business idea validation, Przemo in your terminal, and persistent Google Search Console indexing requests.",
   "owner": {
     "name": "Przemysław Zalewski",
     "url": "https://ciunkos.com"
@@ -11,7 +11,7 @@
       "name": "ciunkos",
       "source": "./",
       "category": "productivity",
-      "description": "business-idea-validator: ten-rubric scoring of a business idea with a fixed-rule verdict, experiments and open questions, in English or Polish. przemo: reviews code hard, answers hard calls, does the work and talks like Przemek on Slack, short, dry, Polish by default."
+      "description": "business-idea-validator: ten-rubric scoring with a fixed-rule verdict. przemo: reviews code, answers hard calls, and does the work. indexnow: prioritize GSC indexing requests, preserve submission history, and follow up on retries and a dead-letter queue."
     }
   ]
 }

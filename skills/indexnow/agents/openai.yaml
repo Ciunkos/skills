@@ -1,0 +1,4 @@
+interface:
+  display_name: "Indexnow for GSC"
+  short_description: "Prioritize GSC requests and track indexing history"
+  default_prompt: "Use $indexnow to request indexing for my site and track the results."

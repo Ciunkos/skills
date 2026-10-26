@@ -17,4 +17,5 @@ jobs:
       - run: for f in $(git ls-files '*.mjs'); do node --check "$f"; done
       - run: npx -y skills-ref validate skills/business-idea-validator
       - run: npx -y skills-ref validate skills/przemo
+      - run: npx -y skills-ref validate skills/indexnow
       - run: node scripts/release-plan.mjs --check

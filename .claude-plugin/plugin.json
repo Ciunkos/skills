@@ -1,10 +1,27 @@
 {
   "name": "ciunkos",
-  "version": "0.3.3",
-  "description": "Skills by Przemysław Zalewski (ciunkos.com). business-idea-validator: score a business idea on ten rubrics and get a fixed-rule verdict with experiments, in English or Polish. przemo: Przemo in your terminal, reviews code hard, answers hard calls, does the work and talks like Przemek on Slack.",
-  "author": { "name": "Przemysław Zalewski", "url": "https://ciunkos.com" },
+  "version": "0.4.0",
+  "description": "Skills by Przemysław Zalewski (ciunkos.com). business-idea-validator: score a business idea and get a fixed-rule verdict. przemo: reviews code, answers hard calls, and does the work. indexnow: prioritize Google Search Console indexing requests and persist retries, results, and a dead-letter queue.",
+  "author": {
+    "name": "Przemysław Zalewski",
+    "url": "https://ciunkos.com"
+  },
   "homepage": "https://ciunkos.com/skills",
   "repository": "https://github.com/Ciunkos/skills",
   "license": "MIT",
-  "keywords": ["business-idea", "startup", "validation", "rubric", "verdict", "polish", "persona", "przemo", "humor", "code-review"]
+  "keywords": [
+    "business-idea",
+    "startup",
+    "validation",
+    "rubric",
+    "verdict",
+    "polish",
+    "persona",
+    "przemo",
+    "humor",
+    "code-review",
+    "indexnow",
+    "google-search-console",
+    "indexing"
+  ]
 }
