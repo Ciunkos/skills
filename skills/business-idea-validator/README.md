@@ -4,7 +4,7 @@ A skill that scores a business idea on ten rubrics and returns a verdict you can
 
 ## What you get
 
-- `report.md`: verdict (Build, Validate first, Pivot, Stop) with the rule that produced it, a ten-row scorecard, a three-sentence summary, the riskiest assumption, up to three experiments for the next two weeks with pass/fail numbers, pivot options, open questions, and one section per rubric with evidence quoted from your text, assumptions, reasoning and what would raise the score.
+- `report.md`: verdict (Build, Validate first, Pivot, Stop) with the rule that produced it, a ten-row scorecard, a three-sentence summary, the riskiest assumption, up to three experiments for the next two weeks with pass/fail numbers, pivot options, open questions, a dated web scan of competitors and communities (when the agent can search), and one section per rubric with evidence quoted from your text, assumptions, reasoning and what would raise the score.
 - `report.json`: the same data, validated against `assets/report.schema.json`.
 
 English or Polish, following the language of the idea.
@@ -37,5 +37,5 @@ node scripts/check.mjs assets/examples/fieldnote/report.json --stdout
 
 ## Limits
 
-- It reads your text. It does not search the web, so competitors and market numbers come from the model's general knowledge and are marked as assumptions.
+- It searches the web only when your agent has a web search tool (`--offline` skips it). The scan lists who already does this, with a link and the published price for each, and public places where your customers gather. It never lists individual people. Market sizes are still not looked up: they are arithmetic with stated assumptions.
 - It is generated with AI and can be wrong. Treat the scores as a starting point and the experiments as the output, not the verdict.

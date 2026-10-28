@@ -41,6 +41,29 @@ FieldNote turns a landscaping crew's photos and hours into a same-evening invoic
 - Have you confirmed the e-invoicing timeline for companies of this size?
 - Which three apps have the owners you know tried and dropped, and why?
 
+## Who already does this
+
+Web scan of 2026-10-28. Each row links to the page it was read from. Prices are as published that day; check them before you rely on them.
+
+**What customers do without a product.** Hours in a paper notebook; Photos and hours in a WhatsApp group; An invoice typed in a spreadsheet or invoicing app a week later
+
+| Product | For whom | Entry price | Free plan | How you differ |
+|---|---|---|---|---|
+| [Jobber](https://www.getjobber.com) | Home service businesses in North America, from one person to teams of 15 | USD 49 per month, 1 user (Core, billed monthly) ([pricing](https://www.getjobber.com/pricing/)) | no | Jobber is a full field service suite in English, priced per user in USD; FieldNote is one flat price for a Polish crew and one job: the same-evening invoice. |
+| [clockin](https://www.clockin.de/en/branchen/garten-und-landschaftsbau) | Landscaping and gardening firms, mainly in German-speaking countries | EUR 3.99 per user per month (Starter, monthly) plus EUR 10 per month under 5 users ([pricing](https://www.clockin.de/en/pricing)) | no | clockin records hours and site photos but leaves the invoice to another tool; FieldNote turns both into the invoice. |
+| [inEwi](https://inewi.pl) (adjacent tool) | Polish companies that track staff hours and schedules | PLN 12.95 net per user per month (monthly billing) ([pricing](https://inewi.pl/cennik)) | no | inEwi tracks hours for payroll; it does not tie the hours and photos of a job to the client's invoice. |
+| [Fakturownia](https://fakturownia.pl) (adjacent tool) | Polish small businesses that issue invoices | PLN 0 (Micro: 3 sales documents a month, 1 user) ([pricing](https://fakturownia.pl/cennik)) | yes | Fakturownia issues the invoice, but someone still types the hours and attaches the proof by hand. |
+
+**What the scan could not settle.** No Polish tool turned up that ties crew hours and site photos to the client invoice; the closest tools do one of the two. Polish prices of the paid Fakturownia plans were not shown on the page.
+
+## Where to find your first ten conversations
+
+Public places where your customers gather. Ask about the problem; do not pitch the product.
+
+- [Stowarzyszenie Architektury Krajobrazu (SAK)](https://sak.org.pl/en/): The Polish member of the European Landscape Contractors Association, started by green-area contractors. Ask whether a short survey can go to members.
+- [Oferteo: garden construction firms](https://www.oferteo.pl/zakladanie-ogrodow): Small landscaping companies list themselves here to win jobs. Their public company pages show region and services, which is enough to pick owners to call.
+- [Panorama Firm: gardening](https://panoramafirm.pl/ogrodnictwo): A business directory of gardening companies by region, useful to reach owners outside the forty you already know.
+
 ## Rubric by rubric
 
 ### Problem: 4/5, Solid (high confidence)
@@ -118,7 +141,7 @@ Bottom-up: assuming 20 000 crews of this size times 29 EUR times 12 months gives
 
 *What do people do today and why would they switch?*
 
-The status quo is named precisely, and the switching reason is concrete: the invoice goes out the same evening with photos instead of a week later. Switching cost is low because the crew already takes photos on phones. The text does not name any competing app, which keeps this from a 5; the founder should check what the owners who already use software use.
+The status quo is named precisely, and the switching reason is concrete: the invoice goes out the same evening with photos instead of a week later. Switching cost is low because the crew already takes photos on phones. Web scan, 2026-10-28: Jobber covers the job end to end but in English and at USD 49 per user, clockin records hours and photos without the invoice, and Polish tools do either hours or invoices. The text does not name any of them, which keeps this from a 5.
 
 **Evidence from the idea text**
 
@@ -128,7 +151,7 @@ The status quo is named precisely, and the switching reason is concrete: the inv
 
 **Assumptions made**
 
-- From general knowledge: field-service tools (Jobber, Workiz) and Polish invoicing apps exist, but target larger teams or only the invoice step.
+- Assuming the owners who already use software use a general invoicing app, as the web scan suggests, rather than a field service suite.
 
 **Questions to answer**
 

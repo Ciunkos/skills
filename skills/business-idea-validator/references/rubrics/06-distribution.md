@@ -33,6 +33,10 @@
 - A referral loop needs a reason to refer; "users will tell their friends" is not one.
 - Paid ads for an unvalidated idea are an experiment, not a channel.
 
+## Market scan
+
+When a `<market-scan>` lists `communities`, check whether the founder's channel reaches the same people, and use a named community in `improve` when the text has no channel. A community is a place to ask, not a channel that sells by itself.
+
 ## Output
 
 Quote whatever the text says about reaching customers. In `assumptions`, name the channel you think fits and why. In `questions`, ask where the founder could get ten conversations with the customer this month without spending money.

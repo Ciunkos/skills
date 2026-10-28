@@ -66,7 +66,19 @@ export const LABELS = {
       score: 'Score',
       cols: { rubric: 'Rubric', band: 'Band', confidence: 'Confidence' },
       meta: 'Generated with AI on {date}. AI can make mistakes, so read the scores as a starting point, not the final word. The verdict follows a fixed rule applied to those scores.',
-      answerKeys: { for: 'Who it is for', money: 'How it makes money', today: 'What they use today', advantage: 'Unfair advantage', stage: 'Stage' }
+      answerKeys: { for: 'Who it is for', money: 'How it makes money', today: 'What they use today', advantage: 'Unfair advantage', stage: 'Stage' },
+      scan: 'Who already does this',
+      scanLead: 'Web scan of {date}. Each row links to the page it was read from. Prices are as published that day; check them before you rely on them.',
+      statusQuo: 'What customers do without a product',
+      scanNone: 'The scan found no product that solves this for the same customer. Treat that as a question, not as good news.',
+      scanCols: { name: 'Product', forWhom: 'For whom', price: 'Entry price', free: 'Free plan', difference: 'How you differ' },
+      free: { yes: 'yes', no: 'no', unknown: 'not found' },
+      priceSource: 'pricing',
+      priceUnknown: 'not published',
+      adjacent: 'adjacent tool',
+      communities: 'Where to find your first ten conversations',
+      scanNotes: 'What the scan could not settle',
+      communitiesLead: 'Public places where your customers gather. Ask about the problem; do not pitch the product.'
     }
   },
   pl: {
@@ -125,7 +137,19 @@ export const LABELS = {
       score: 'Ocena',
       cols: { rubric: 'Rubryka', band: 'Poziom', confidence: 'Pewność' },
       meta: 'Wygenerowane przez AI {date}. AI może się mylić, więc traktuj oceny jako punkt wyjścia, nie ostatnie słowo. Werdykt wynika ze stałej reguły nałożonej na te oceny.',
-      answerKeys: { for: 'Dla kogo', money: 'Jak zarabia', today: 'Czego używają dziś', advantage: 'Nieuczciwa przewaga', stage: 'Etap' }
+      answerKeys: { for: 'Dla kogo', money: 'Jak zarabia', today: 'Czego używają dziś', advantage: 'Nieuczciwa przewaga', stage: 'Etap' },
+      scan: 'Kto już to robi',
+      scanLead: 'Przegląd sieci z {date}. Każdy wiersz prowadzi do strony, z której go odczytano. Ceny są z tego dnia; sprawdź je, zanim na nich oprzesz decyzję.',
+      statusQuo: 'Co klienci robią bez produktu',
+      scanNone: 'Przegląd nie znalazł produktu, który rozwiązuje to dla tego samego klienta. Traktuj to jako pytanie, nie jako dobrą wiadomość.',
+      scanCols: { name: 'Produkt', forWhom: 'Dla kogo', price: 'Cena wejściowa', free: 'Darmowy plan', difference: 'Czym się różnisz' },
+      free: { yes: 'tak', no: 'nie', unknown: 'nie znaleziono' },
+      priceSource: 'cennik',
+      priceUnknown: 'brak publicznej ceny',
+      adjacent: 'narzędzie z sąsiedniej kategorii',
+      communities: 'Gdzie znaleźć pierwsze dziesięć rozmów',
+      scanNotes: 'Czego przegląd nie rozstrzygnął',
+      communitiesLead: 'Publiczne miejsca, w których bywają Twoi klienci. Pytaj o problem, nie sprzedawaj produktu.'
     }
   }
 };

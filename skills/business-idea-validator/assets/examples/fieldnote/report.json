@@ -76,9 +76,9 @@
         "Notebook, WhatsApp photos, invoice in a spreadsheet template a week later."
       ],
       "assumptions": [
-        "From general knowledge: field-service tools (Jobber, Workiz) and Polish invoicing apps exist, but target larger teams or only the invoice step."
+        "Assuming the owners who already use software use a general invoicing app, as the web scan suggests, rather than a field service suite."
       ],
-      "reasoning": "The status quo is named precisely, and the switching reason is concrete: the invoice goes out the same evening with photos instead of a week later. Switching cost is low because the crew already takes photos on phones. The text does not name any competing app, which keeps this from a 5; the founder should check what the owners who already use software use.",
+      "reasoning": "The status quo is named precisely, and the switching reason is concrete: the invoice goes out the same evening with photos instead of a week later. Switching cost is low because the crew already takes photos on phones. Web scan, 2026-10-28: Jobber covers the job end to end but in English and at USD 49 per user, clockin records hours and photos without the invoice, and Polish tools do either hours or invoices. The text does not name any of them, which keeps this from a 5.",
       "questions": [
         "Which three apps have the owners you know tried and dropped, and why?"
       ],
@@ -214,6 +214,80 @@
       }
     ],
     "notes": "The scores track the text. The one soft spot is monetization: no evidence yet that these owners pay for any software, so medium confidence there is right."
+  },
+  "scan": {
+    "searchedAt": "2026-10-28",
+    "queries": [
+      "landscaping crew app time tracking photos invoicing small business pricing",
+      "aplikacja ewidencja czasu pracy ekipa zdjęcia faktura firma ogrodnicza",
+      "Jobber pricing core plan per month",
+      "stowarzyszenie firm terenów zieleni Polska"
+    ],
+    "statusQuo": [
+      "Hours in a paper notebook",
+      "Photos and hours in a WhatsApp group",
+      "An invoice typed in a spreadsheet or invoicing app a week later"
+    ],
+    "competitors": [
+      {
+        "name": "Jobber",
+        "url": "https://www.getjobber.com",
+        "kind": "direct",
+        "forWhom": "Home service businesses in North America, from one person to teams of 15",
+        "price": "USD 49 per month, 1 user (Core, billed monthly)",
+        "priceUrl": "https://www.getjobber.com/pricing/",
+        "freeTier": "no",
+        "difference": "Jobber is a full field service suite in English, priced per user in USD; FieldNote is one flat price for a Polish crew and one job: the same-evening invoice."
+      },
+      {
+        "name": "clockin",
+        "url": "https://www.clockin.de/en/branchen/garten-und-landschaftsbau",
+        "kind": "direct",
+        "forWhom": "Landscaping and gardening firms, mainly in German-speaking countries",
+        "price": "EUR 3.99 per user per month (Starter, monthly) plus EUR 10 per month under 5 users",
+        "priceUrl": "https://www.clockin.de/en/pricing",
+        "freeTier": "no",
+        "difference": "clockin records hours and site photos but leaves the invoice to another tool; FieldNote turns both into the invoice."
+      },
+      {
+        "name": "inEwi",
+        "url": "https://inewi.pl",
+        "kind": "adjacent",
+        "forWhom": "Polish companies that track staff hours and schedules",
+        "price": "PLN 12.95 net per user per month (monthly billing)",
+        "priceUrl": "https://inewi.pl/cennik",
+        "freeTier": "no",
+        "difference": "inEwi tracks hours for payroll; it does not tie the hours and photos of a job to the client's invoice."
+      },
+      {
+        "name": "Fakturownia",
+        "url": "https://fakturownia.pl",
+        "kind": "adjacent",
+        "forWhom": "Polish small businesses that issue invoices",
+        "price": "PLN 0 (Micro: 3 sales documents a month, 1 user)",
+        "priceUrl": "https://fakturownia.pl/cennik",
+        "freeTier": "yes",
+        "difference": "Fakturownia issues the invoice, but someone still types the hours and attaches the proof by hand."
+      }
+    ],
+    "communities": [
+      {
+        "name": "Stowarzyszenie Architektury Krajobrazu (SAK)",
+        "url": "https://sak.org.pl/en/",
+        "why": "The Polish member of the European Landscape Contractors Association, started by green-area contractors. Ask whether a short survey can go to members."
+      },
+      {
+        "name": "Oferteo: garden construction firms",
+        "url": "https://www.oferteo.pl/zakladanie-ogrodow",
+        "why": "Small landscaping companies list themselves here to win jobs. Their public company pages show region and services, which is enough to pick owners to call."
+      },
+      {
+        "name": "Panorama Firm: gardening",
+        "url": "https://panoramafirm.pl/ogrodnictwo",
+        "why": "A business directory of gardening companies by region, useful to reach owners outside the forty you already know."
+      }
+    ],
+    "notes": "No Polish tool turned up that ties crew hours and site photos to the client invoice; the closest tools do one of the two. Polish prices of the paid Fakturownia plans were not shown on the page."
   },
   "synthesis": {
     "summary": "FieldNote turns a landscaping crew's photos and hours into a same-evening invoice for small Polish owners. The customer, the pain and the first channel are concrete, and the founder has lived the business. The open points are whether owners pay for software at all, how big the national market is, and who builds the app at eight hours a week.",

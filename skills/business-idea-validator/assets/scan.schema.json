@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Market scan",
+  "description": "What the optional web scan returns: who already does this and where the first customers gather. Every row carries a link read during the scan. Sent as-is to the model as the structured output format, so it uses only the subset structured outputs accept. Limits are enforced by scripts/schema.mjs (SCAN_LIMITS).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["searchedAt", "queries", "statusQuo", "competitors", "communities", "notes"],
+  "properties": {
+    "searchedAt": { "type": "string", "description": "ISO date of the scan, YYYY-MM-DD." },
+    "queries": { "type": "array", "items": { "type": "string" }, "description": "Up to 8 search queries actually run." },
+    "statusQuo": { "type": "array", "items": { "type": "string" }, "description": "Up to 3 things the customer does today without a product (a notebook, a spreadsheet, a group chat, nothing)." },
+    "competitors": {
+      "type": "array",
+      "description": "Up to 8 products or services that solve the same problem for a similar customer. Never an article, a list, a review site or a platform that only hosts such tools.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url", "kind", "forWhom", "price", "priceUrl", "freeTier", "difference"],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": "string", "description": "The product's own home page, as seen in the search results." },
+          "kind": { "type": "string", "enum": ["direct", "adjacent"], "description": "direct: same problem, same customer. adjacent: a general tool the customer could bend to the job." },
+          "forWhom": { "type": "string", "description": "Who the product says it is for, in a few words." },
+          "price": { "type": "string", "description": "The entry price exactly as published, with currency and period. Empty when it was not read on a page." },
+          "priceUrl": { "type": "string", "description": "The page the price was read from. Empty when price is empty." },
+          "freeTier": { "type": "string", "enum": ["yes", "no", "unknown"] },
+          "difference": { "type": "string", "description": "One sentence: how the idea differs from this product, from the customer's point of view." }
+        }
+      }
+    },
+    "communities": {
+      "type": "array",
+      "description": "Up to 5 public places where the target customers talk about the problem: a forum, a subreddit, a group, a trade association. Never a named person or a personal profile.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "url", "why"],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": "string" },
+          "why": { "type": "string", "description": "One sentence: why the customer is there and what to ask." }
+        }
+      }
+    },
+    "notes": { "type": "string", "description": "What the scan could not settle, in at most two sentences. Empty when nothing applies." }
+  }
+}

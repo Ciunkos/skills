@@ -4,12 +4,16 @@
    labels and structure only. */
 import { labels, fill, RUBRIC_ORDER } from './i18n.mjs';
 import { band, byId } from './verdict.mjs';
+import { isHttpUrl } from './schema.mjs';
 
 /* Markdown-safe inline text: no raw HTML, no line breaks inside a cell. */
 const md = (s) => String(s == null ? '' : s).replace(/[<>]/g, (c) => (c === '<' ? '‹' : '›')).replace(/\|/g, '∣').replace(/\s*\n\s*/g, ' ').trim();
 const block = (s) => String(s == null ? '' : s).replace(/[<>]/g, (c) => (c === '<' ? '‹' : '›')).trim();
 const list = (arr) => (arr && arr.length ? arr.map((x) => `- ${md(x)}`).join('\n') : '');
 const quotes = (arr) => (arr && arr.length ? arr.map((x) => `> ${md(x)}`).join('\n>\n') : '');
+
+/* A Markdown link only for plain http(s) URLs; anything else prints as text. */
+const link = (text, url) => (isHttpUrl(url) ? `[${md(text)}](${String(url).replace(/[()]/g, (c) => (c === '(' ? '%28' : '%29'))})` : md(text));
 
 const pips = (score) => '●'.repeat(band(score)) + '○'.repeat(5 - band(score));
 
@@ -59,6 +63,8 @@ export function renderMarkdown(report, lang = report.lang) {
   if (s.pivots && s.pivots.length) { parts.push(`## ${S.pivots}`); parts.push(''); parts.push(list(s.pivots)); parts.push(''); }
   if (s.openQuestions && s.openQuestions.length) { parts.push(`## ${S.questions}`); parts.push(''); parts.push(list(s.openQuestions)); parts.push(''); }
 
+  if (report.scan) parts.push(...renderScan(report.scan, S));
+
   parts.push(`## ${S.rubrics}`);
   parts.push('');
   for (const id of RUBRIC_ORDER) {
@@ -98,4 +104,26 @@ export function renderMarkdown(report, lang = report.lang) {
   parts.push(block(fill(S.meta, { date: String(report.meta.createdAt).slice(0, 10), model: report.meta.model })));
   parts.push('');
   return parts.join('\n');
+}
+
+/* The web scan: who already does this, then where the first customers gather. */
+function renderScan(scan, S) {
+  const out = [`## ${S.scan}`, '', block(fill(S.scanLead, { date: String(scan.searchedAt).slice(0, 10) })), ''];
+  if (scan.statusQuo && scan.statusQuo.length) out.push(`**${S.statusQuo}.** ${scan.statusQuo.map(md).join('; ')}`, '');
+  if (scan.competitors && scan.competitors.length) {
+    const C = S.scanCols;
+    out.push(`| ${C.name} | ${C.forWhom} | ${C.price} | ${C.free} | ${C.difference} |`, '|---|---|---|---|---|');
+    for (const c of scan.competitors) {
+      const name = link(c.name, c.url) + (c.kind === 'adjacent' ? ` (${S.adjacent})` : '');
+      const price = c.price ? `${md(c.price)}${isHttpUrl(c.priceUrl) ? ` (${link(S.priceSource, c.priceUrl)})` : ''}` : md(S.priceUnknown);
+      out.push(`| ${name} | ${md(c.forWhom)} | ${price} | ${md(S.free[c.freeTier] || S.free.unknown)} | ${md(c.difference)} |`);
+    }
+    out.push('');
+  } else out.push(block(S.scanNone), '');
+  if (scan.notes && String(scan.notes).trim()) out.push(`**${S.scanNotes}.** ${block(scan.notes)}`, '');
+  if (scan.communities && scan.communities.length) {
+    out.push(`## ${S.communities}`, '', block(S.communitiesLead), '');
+    out.push(scan.communities.map((c) => `- ${link(c.name, c.url)}: ${md(c.why)}`).join('\n'), '');
+  }
+  return out;
 }

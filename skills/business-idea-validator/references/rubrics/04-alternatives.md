@@ -34,6 +34,10 @@
 - A feature advantage is temporary; a distribution or data advantage lasts.
 - Free alternatives (a spreadsheet, a free tier) count as competitors.
 
+## Market scan
+
+When a `<market-scan>` is present, it is the main input for this rubric. Compare the idea against its `statusQuo` and `competitors`, and name the closest one in `reasoning` ("Web scan, <date>: …"). A dated scan that names the alternatives settles what exists, so confidence can be high even when the founder's text names none; the switching reason still has to come from the text. A direct competitor at a lower price for the same customer points to 1 or 2. An empty scan is not proof of no competition: follow the "no competition" trap below.
+
 ## Output
 
 In `evidence`, quote what the text says about today's workaround and competitors. In `assumptions`, list the alternatives you added from general knowledge, marked as such. In `questions`, ask what the last three prospects said they use today.

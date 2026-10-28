@@ -33,6 +33,10 @@
 - Marketplaces: commission on a thin-margin category rarely covers acquisition.
 - "Enterprises will pay a lot" needs a sales motion the founder can run (see rubric 6 and 9).
 
+## Market scan
+
+When a `<market-scan>` is present, compare the idea's price with the published entry prices and free plans of the competitors, and say what the customer pays today for the closest alternative. A free plan that covers the job is a strong reason to lower the score unless the text explains why customers would pay more.
+
 ## Output
 
 Write the sketch in `reasoning` with its arithmetic. Every assumed price, count or cost goes in `assumptions`. In `questions`, ask what the customer pays today for the alternative and who approves that spend.

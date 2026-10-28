@@ -7,11 +7,12 @@
    node check.mjs report.json --lang pl  → render in Polish regardless of report.lang
    node check.mjs report.json --stdout   → print Markdown instead of writing report.md
    node check.mjs --rubric rubric.json   → validate one rubric result only
+   node check.mjs --scan scan.json       → validate one web scan only
    Exit code 1 on any problem. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { check, checkReport, checkRubricLimits } from './schema.mjs';
+import { check, checkReport, checkRubricLimits, checkScan } from './schema.mjs';
 import { verdict } from './verdict.mjs';
 import { renderMarkdown } from './render.mjs';
 import { RUBRIC_ORDER, LANGS } from './i18n.mjs';
@@ -21,7 +22,7 @@ const schema = (name) => JSON.parse(readFileSync(join(here, '..', 'assets', name
 
 const args = process.argv.slice(2);
 const flag = (name) => { const i = args.indexOf(name); return i >= 0 ? (args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : true) : null; };
-const file = args.find((a) => !a.startsWith('--') && !['--lang', '--rubric'].includes(args[args.indexOf(a) - 1]));
+const file = args.find((a) => !a.startsWith('--') && !['--lang', '--rubric', '--scan'].includes(args[args.indexOf(a) - 1]));
 
 const fail = (lines) => { for (const l of lines) console.error('  ' + l); process.exit(1); };
 
@@ -33,6 +34,14 @@ if (flag('--rubric')) {
   process.exit(0);
 }
 
+if (flag('--scan')) {
+  const sc = JSON.parse(readFileSync(resolve(flag('--scan')), 'utf8'));
+  const problems = [...check(sc, schema('scan.schema.json')), ...checkScan(sc)];
+  if (problems.length) { console.error('scan has problems:'); fail(problems); }
+  console.log(`OK: scan valid (${sc.competitors.length} competitors, ${sc.communities.length} communities)`);
+  process.exit(0);
+}
+
 if (!file) { console.error('usage: node check.mjs report.json [--lang en|pl] [--stdout]'); process.exit(1); }
 const path = resolve(file);
 const report = JSON.parse(readFileSync(path, 'utf8'));
@@ -41,7 +50,7 @@ if (!LANGS.includes(lang)) { console.error(`unknown lang ${lang}`); process.exit
 
 /* The verdict is always recomputed: the rule is the source of truth, not what a model wrote. */
 report.verdict = verdict(report);
-const problems = checkReport(report, { reportSchema: schema('report.schema.json'), rubricSchema: schema('rubric-output.schema.json'), order: RUBRIC_ORDER });
+const problems = checkReport(report, { reportSchema: schema('report.schema.json'), rubricSchema: schema('rubric-output.schema.json'), scanSchema: schema('scan.schema.json'), order: RUBRIC_ORDER });
 if (problems.length) { console.error('report has problems:'); fail(problems); }
 
 writeFileSync(path, JSON.stringify(report, null, 2) + '\n');

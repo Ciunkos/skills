@@ -1,18 +1,18 @@
 ---
 name: business-idea-validator
-description: Validate a business or startup idea against ten rubrics (problem, customer, market, alternatives, monetization, distribution, feasibility, defensibility, founder fit, risks), each scored 1 to 5 with evidence and confidence, and get a fixed-rule verdict (Build, Validate first, Pivot, Stop) with the riskiest assumption, three cheap experiments and open questions, as Markdown and JSON, in English or Polish. Use when asked to validate, assess, score, stress-test or sanity-check a business idea, startup idea, product idea, SaaS idea or side project, or when the user types /business-idea-validator with an idea. Not for market research reports, pitch decks or financial models.
+description: Validate a business or startup idea against ten rubrics (problem, customer, market, alternatives, monetization, distribution, feasibility, defensibility, founder fit, risks), each scored 1 to 5 with evidence and confidence, and get a fixed-rule verdict (Build, Validate first, Pivot, Stop) with the riskiest assumption, three cheap experiments, open questions and an optional dated web scan of competitors and where the customers gather, as Markdown and JSON, in English or Polish. Use when asked to validate, assess, score, stress-test or sanity-check a business idea, startup idea, product idea, SaaS idea or side project, or when the user types /business-idea-validator with an idea. Not for market research reports, pitch decks or financial models.
 license: MIT
 compatibility: Any agent that can read files and run Node 20+ (for scripts/check.mjs). Subagents are optional.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
   author: Przemysław Zalewski
   homepage: https://ciunkos.com/business-idea-validator
-  usage: "<idea text or path to a file> [--lang en|pl] [--quick] [--out <dir>]"
+  usage: "<idea text or path to a file> [--lang en|pl] [--quick] [--offline] [--out <dir>]"
 ---
 
 # Business idea validator
 
-Usage: `/business-idea-validator <idea text or path to a file> [--lang en|pl] [--quick] [--out <dir>]`
+Usage: `/business-idea-validator <idea text or path to a file> [--lang en|pl] [--quick] [--offline] [--out <dir>]`
 
 Score one business idea on ten rubrics, apply a fixed verdict rule, write a report. The judgment is in the scores and their reasoning; the verdict is arithmetic over the scores so that two ideas get the same treatment and a reader can check it by hand.
 
@@ -24,7 +24,9 @@ Run from a working directory of the user's choice (`--out <dir>`, default the cu
 - `references/report-style.md`: writing rules. Read once before any scoring.
 - `references/intake.md`: when to ask the founder questions first.
 - `references/verdict.md`: the rule, for your understanding; the code is `scripts/verdict.mjs`.
+- `references/scan.md`: the optional web scan (who already does this, where the customers gather).
 - `assets/rubric-output.schema.json`: the exact JSON one rubric pass returns.
+- `assets/scan.schema.json`: the web scan.
 - `assets/report.schema.json`: the whole report.
 - `assets/examples/fieldnote/`: a complete example (invented idea) of `idea.md`, `report.json`, `report.md`.
 - `scripts/check.mjs`: validates, computes the verdict, renders Markdown. `${CLAUDE_SKILL_DIR}` points at this folder in Claude Code; elsewhere use the path the skill was installed to.
@@ -39,11 +41,15 @@ Apply `references/intake.md`. If the text is thin (under about 40 words, or miss
 
 Store what you have as `idea.text` and `idea.answers` (`for`, `money`, `today`, `advantage`, `stage`; only the ones given).
 
+### 1b. Market scan
+
+Skip with `--offline`, or when you have no web search tool; then add one sentence to `synthesis.notes` saying the report did not search the web. Otherwise follow `references/scan.md`: 4 to 8 searches, at most 8 competitors and 5 communities, every row with a link you saw in the results, prices only as read on a pricing page. Save `<out>/scan.json` and check it with `node ${CLAUDE_SKILL_DIR}/scripts/check.mjs --scan <out>/scan.json`.
+
 ### 2. Score the ten rubrics
 
 Read `references/report-style.md` first. Then, for each rubric in the order `problem, customer, market, alternatives, monetization, distribution, feasibility, moat, founder, risks`:
 
-- Give the pass the idea text, the answers, the rubric file, the style rules and the output schema.
+- Give the pass the idea text, the answers, the scan (if any) as a `<market-scan>` block, the rubric file, the style rules and the output schema.
 - The pass returns one JSON object matching `assets/rubric-output.schema.json`: `id`, `score` 1 to 5, `confidence` low/medium/high, `evidence` (exact quotes), `assumptions`, `reasoning` (at most 160 words), `questions`, `improve`.
 
 Run the passes in parallel through the `business-idea-rubric` subagent when the Agent tool is available (one agent per rubric, brief it with the file paths and the idea; ask it to return only the JSON). Otherwise score them yourself, one rubric at a time, reading the rubric file fresh each time so the anchors stay in front of you.
@@ -56,11 +62,11 @@ Skip with `--quick`. Otherwise give the `business-idea-critic` subagent (or do i
 
 ### 4. Synthesis
 
-With the final scores, write the synthesis object (`assets/report.schema.json`, `synthesis`): `summary` (three sentences), `riskiestAssumption` (one), `experiments` (one to three, 14 days max, each with a numeric metric), `pivots` (only real ones; empty is fine), `openQuestions` (the rubric questions, deduplicated, most important first, at most eight), `notes` (how the report was made when it matters, else empty). Follow the synthesis rules in `references/report-style.md`.
+With the final scores, write the synthesis object (`assets/report.schema.json`, `synthesis`): `summary` (three sentences), `riskiestAssumption` (one), `experiments` (one to three, 14 days max, each with a numeric metric), `pivots` (only real ones; empty is fine), `openQuestions` (the rubric questions, deduplicated, most important first, at most eight), `notes` (how the report was made when it matters, else empty). Follow the synthesis rules in `references/report-style.md`. When the scan lists communities, the first experiment says where to find the people to talk to.
 
 ### 5. Assemble and render
 
-Write `<out>/report.json` with `version: "1"`, `lang`, `idea`, `rubrics` (all ten), `critic` (if run), `synthesis`, `verdict: {}` (the script fills it; never write a verdict by hand), `meta` (`model`: the model you are running on as you know it, `createdAt`: ISO date, `generator`: "skill").
+Write `<out>/report.json` with `version: "1"`, `lang`, `idea`, `rubrics` (all ten), `critic` (if run), `scan` (if run), `synthesis`, `verdict: {}` (the script fills it; never write a verdict by hand), `meta` (`model`: the model you are running on as you know it, `createdAt`: ISO date, `generator`: "skill").
 
 Run `node ${CLAUDE_SKILL_DIR}/scripts/check.mjs <out>/report.json`. It validates everything, writes the verdict into the file and writes `<out>/report.md`. Fix problems until it prints `OK`.
 

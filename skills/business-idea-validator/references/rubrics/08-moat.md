@@ -34,6 +34,10 @@
 - Early-stage ideas rarely have a moat yet. Score 3 for "none yet, plausible later" and do not punish stage alone.
 - Execution speed is an advantage, but it is scored in rubric 9, not here.
 
+## Market scan
+
+When a `<market-scan>` is present, ask whether the closest direct competitor could add the idea's difference in a quarter. A difference that rests on a local market, language or an audience the competitors ignore lasts longer than a feature.
+
 ## Output
 
 In `reasoning`, name the most likely copier (incumbent, platform, new entrant) and what would stop them. In `assumptions`, say whether you assumed an AI-wrapper structure. In `questions`, ask what the product will know after a year that a new competitor would not.

@@ -11,7 +11,7 @@ import { RUBRIC_ORDER, LABELS, LANGS } from '../scripts/i18n.mjs';
 const here = new URL('.', import.meta.url);
 const load = (p) => JSON.parse(readFileSync(new URL(p, here), 'utf8'));
 const report = load('../assets/examples/fieldnote/report.json');
-const schemas = { reportSchema: load('../assets/report.schema.json'), rubricSchema: load('../assets/rubric-output.schema.json'), order: RUBRIC_ORDER };
+const schemas = { reportSchema: load('../assets/report.schema.json'), rubricSchema: load('../assets/rubric-output.schema.json'), scanSchema: load('../assets/scan.schema.json'), order: RUBRIC_ORDER };
 
 test('example report is valid and its verdict is reproducible', () => {
   assert.deepEqual(checkReport(report, schemas), []);
@@ -55,4 +55,28 @@ test('every label exists in every language', () => {
   const keys = (o, p = '') => Object.entries(o).flatMap(([k, v]) => (v && typeof v === 'object' ? keys(v, p + k + '.') : [p + k]));
   const en = keys(LABELS.en).sort();
   for (const lang of LANGS) assert.deepEqual(keys(LABELS[lang]).sort(), en, lang);
+});
+
+test('the scan renders two sections with links, and nothing without a scan', () => {
+  assert.ok(report.scan, 'the example carries a scan');
+  const en = renderMarkdown(report, 'en');
+  assert.ok(en.includes('## Who already does this'));
+  assert.ok(en.includes('## Where to find your first ten conversations'));
+  const c = report.scan.competitors[0];
+  assert.ok(en.includes(`[${c.name}](${c.url})`));
+  assert.ok(renderMarkdown(report, 'pl').includes('## Kto już to robi'));
+  const r = JSON.parse(JSON.stringify(report));
+  delete r.scan;
+  assert.ok(!renderMarkdown(r, 'en').includes('Who already does this'));
+  assert.deepEqual(checkReport(r, schemas), [], 'scan is optional');
+});
+
+test('scan links that are not http(s) print as plain text', () => {
+  const r = JSON.parse(JSON.stringify(report));
+  r.scan.competitors[0].url = 'javascript:alert(1)';
+  r.scan.communities[0].url = 'https://x.example.com/a)(b';
+  const md = renderMarkdown(r, 'en');
+  assert.ok(!md.includes('javascript:'));
+  assert.ok(md.includes('https://x.example.com/a%29%28b'));
+  assert.ok(checkReport(r, schemas).some((p) => p.includes('competitors[0].url')));
 });

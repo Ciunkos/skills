@@ -130,6 +130,10 @@
         }
       }
     },
+    "scan": {
+      "$ref": "scan.schema.json",
+      "description": "Optional web scan made before scoring. Absent when no web search was available."
+    },
     "synthesis": {
       "type": "object",
       "additionalProperties": false,

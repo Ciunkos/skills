@@ -35,6 +35,10 @@ General rule (see `report-style.md`): high when the text settles the score, or w
 - "Nobody is doing this" is more often a bad sign than a good one.
 - Local ideas in small currencies: size in the local currency and say so.
 
+## Market scan
+
+When a `<market-scan>` is present, use the published prices of direct competitors as the price range in your arithmetic, and say so ("Web scan, <date>: entry prices run from X to Y"). Many direct competitors mean the market exists and is contested, not that it is large. The scan does not give market size; never turn a competitor count into one.
+
 ## Output
 
 Show your arithmetic in `reasoning` (buyers × price = yearly ceiling; reachable share). Put every number you assumed in `assumptions`. In `questions`, ask for the fact that would move the estimate most.
