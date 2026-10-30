@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+The click method for Request indexing now depends on the harness. Codex keeps native window controls, because tab clicks were rejected there. Other harnesses, such as Claude Code with Claude in Chrome, use the browser extension's tab screenshot and coordinate click, which gave a clear outcome for every click. DOM, script, and element-reference clicks stay out of submission everywhere. Workspaces and commands are unchanged.
+
 ## 0.2.0
 
 The queue is now seeded from Search Console instead of a crawl. A new `report` command records rows from the Page indexing report, so pages Google lists as crawled or discovered but not indexed are inspected first, and pages it lists as indexed or excluded are skipped for seven days unless a hint, a revision, or a fresh fetch says otherwise. Sitemaps register pages with their `lastmod` without fetching them; a later `lastmod` becomes a change candidate. Internal links are crawled only when a site has no sitemap or `configure` sets `crawlLinks`. A new `fetch` command reads named candidates before inspection, and `next` reports when each page was last fetched. A run starts from robots.txt and drops the pending fetch backlog of earlier versions. Existing workspaces replay unchanged, and the log shows the report counts.

@@ -47,7 +47,7 @@ JSON can be supplied with `--input <file>` or `--input -` for stdin. Prefer stru
 
 For example, after resolving "changed pricing page" to a URL, use a revision key such as `hint:<hint-id>`. For a confirmed content change, use the saved content hash as the revision key. Reusing the same key does not reset a cycle. A new key requires fresh meaningful evidence. A timestamp alone is not evidence of a significant revision.
 
-For submission, follow [the native browser sequence](browser.md): refresh and capture the current window before `begin`, then coordinate-click immediately afterward. Save outcome screenshot proof in the external workspace and include its path in `result.evidence`. Preserve confirmed acceptance, including manual acceptance evidence, rather than resubmitting to test a method.
+For submission, follow [the browser sequence for your harness](browser.md): refresh and capture a fresh screenshot before `begin`, then coordinate-click immediately afterward. Save outcome screenshot proof in the external workspace and include its path in `result.evidence`. Preserve confirmed acceptance, including manual acceptance evidence, rather than resubmitting to test a method.
 
 ## Discovery
 

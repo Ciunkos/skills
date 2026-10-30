@@ -26,7 +26,7 @@ ln -s /absolute/path/to/ciunkos-skills/skills/indexnow ~/.agents/skills/indexnow
 
 Start a new session to discover the skill. Codex can invoke it as `$indexnow`. Other Agent Skills runners can load the same folder. Browser access and filesystem tools are required for execution; uploading a package to a runner without them does not provide those capabilities.
 
-Requirements: Node 20 or later, a writable directory, native Chrome window controls with screenshots and coordinate clicks, and owner or full-user access to the GSC property. No npm dependencies or Google API keys are needed. Use the equivalent native tools in your agent's harness.
+Requirements: Node 20 or later, a writable directory, browser screenshots with coordinate clicks (native Chrome window controls in Codex, the browser extension such as Claude in Chrome elsewhere), and owner or full-user access to the GSC property. No npm dependencies or Google API keys are needed. Use the equivalent tools in your agent's harness.
 
 ## What it remembers
 
@@ -62,6 +62,6 @@ The helper reports an active run rather than silently launching a competing one.
 
 ## Browser troubleshooting
 
-The preferred submission path is native Chrome navigation, keyboard refresh, a fresh window screenshot, and a native coordinate click. It succeeded in a controlled attempt after browser-tab clicks failed; the exact cause remains unknown. Generic errors do not establish quota exhaustion or a CAPTCHA block. If a CAPTCHA appears, the user completes it. See [the browser procedure](references/browser.md) for the sequence and tool examples. Do not resubmit accepted URLs to test the method.
+The submission path depends on the harness. In Codex it is native Chrome navigation, keyboard refresh, a fresh window screenshot, and a native coordinate click; it succeeded there after browser-tab clicks failed, and the exact cause remains unknown. In other harnesses, such as Claude Code, the browser extension's tab screenshot and coordinate click work and are the expected path. DOM and script clicks are never used. Generic errors do not establish quota exhaustion or a CAPTCHA block. If a CAPTCHA appears, the user completes it. See [the browser procedure](references/browser.md) for the sequence and tool examples. Do not resubmit accepted URLs to test the method.
 
 See [the workspace reference](references/workspace.md) for helper inputs and recovery, and [the protocol reference](references/indexnow.md) for Bing IndexNow and Google's interfaces.

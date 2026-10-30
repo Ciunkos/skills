@@ -1,10 +1,16 @@
 # GSC browser procedure
 
-Use the user's authenticated Chrome session. Discover the harness's native app/window controls, screenshots, keyboard shortcuts, and coordinate clicks. Follow its API and coordinate conventions. Browser extensions and tab tools can help locate information; prefer native controls throughout the submission sequence.
+Use the user's authenticated Chrome session. Discover the harness's screenshot, keyboard, and coordinate-click tools and follow their API and coordinate conventions. Which click tool submits depends on the harness; see [Submission controls by harness](#submission-controls-by-harness). Tab-reading tools can help locate information anywhere.
+
+## Submission controls by harness
+
+- **Codex (ChatGPT app):** use native app/window controls for the whole submission sequence: native navigation, native keyboard refresh, a fresh native-window screenshot, and a native coordinate click. Browser-tab clicks were rejected there with the generic error.
+- **Other harnesses, such as Claude Code with Claude in Chrome:** use the browser extension's tab screenshot and coordinate click. This is the expected path, not a fallback; do not switch to window-level controls. It produced a clear, visible outcome for every click.
+- **Every harness:** never click Request indexing through DOM scripts, Playwright, `element.click()`, or element references. Take the coordinates from a fresh screenshot of the same surface you click.
 
 ## Authentication and property
 
-Foreground the intended Chrome window and Search Console tab. Reuse the signed-in profile; do not extract browser credentials or tokens. If native controls are unavailable, report the limitation and preserve progress for user handoff. Do not silently replace the preferred submission method with a tab click.
+Foreground the intended Chrome window and Search Console tab. Reuse the signed-in profile; do not extract browser credentials or tokens. If the controls your harness requires are unavailable, report the limitation and preserve progress for user handoff. In Codex, do not silently replace native controls with a tab click.
 
 Open Search Console and resolve the domain property (`sc-domain:example.com`) or the matching URL-prefix property (`https://www.example.com/`). Confirm the selected property covers the inspected URL. A domain property can cover subdomains, but the helper keeps discovery within the requested hostname and its www counterpart. Record out-of-scope language alternates as gaps for separate site runs.
 
@@ -26,11 +32,11 @@ Map reasons to a status by meaning, reading labels in the user's language:
 | excluded | Excluded by noindex tag; Alternate page with proper canonical tag; Duplicate without user-selected canonical; Duplicate, Google chose different canonical than user; Page with redirect; Redirect error; Blocked by robots.txt; Blocked due to unauthorized request (401); Blocked due to access forbidden (403); Not found (404); Server error (5xx); Soft 404 |
 | indexed | The indexed pages sample |
 
-Observed Polish labels include "Strona zeskanowana, ale jeszcze nie zindeksowana" for crawled, currently not indexed and "Alternatywna strona zawierająca prawidłowy tag strony kanonicznej" for the canonical alternate. An excluded page returns to the queue only after a hint, a significant revision, or a fresh `fetch` that finds it indexable. Browser-tab reading tools are fine here; the native sequence below applies to submission.
+Observed Polish labels include "Strona zeskanowana, ale jeszcze nie zindeksowana" for crawled, currently not indexed and "Alternatywna strona zawierająca prawidłowy tag strony kanonicznej" for the canonical alternate. An excluded page returns to the queue only after a hint, a significant revision, or a fresh `fetch` that finds it indexable. Browser-tab reading tools are fine here; the controls by harness apply to submission.
 
 ## Inspection evidence
 
-Use native Chrome controls to enter the fully qualified URL in the property's inspection field. Wait for indexed data to load. Capture:
+Use your harness's submission controls to enter the fully qualified URL in the property's inspection field. Wait for indexed data to load. Capture:
 
 - Whether GSC says the URL is on Google, not on Google, or the result is unavailable.
 - The last crawl timestamp and Google-selected canonical, when present.
@@ -45,19 +51,19 @@ Read current labels in the user's language. Do not assume an English UI or hard-
 For a helper action of `submit`:
 
 1. Use the authenticated Chrome session and foreground the intended GSC tab.
-2. Navigate and inspect through native Chrome controls.
-3. Refresh using the native keyboard shortcut. Wait until the correct inspected URL and result are visible.
-4. Capture a fresh native-window screenshot and locate Request indexing in that image.
+2. Navigate and inspect with your harness's submission controls.
+3. Refresh with a keyboard shortcut. Wait until the correct inspected URL and result are visible.
+4. Capture a fresh screenshot (native window in Codex, the extension's tab screenshot elsewhere) and locate Request indexing in that image.
 5. Record the helper's `begin` intent immediately before submission. Keep its ID.
-6. Click that button using the native app/window coordinate-click tool.
+6. Click that button with the coordinate click from the same tool.
 7. Wait for the actual acceptance, rejection, or quota message. Save screenshot proof and record `result` with the matching intent ID, exact message, and proof location.
 8. After acceptance, continue with another eligible URL. Stop for an explicit quota message; there is no local request-count limit.
 
-Coordinates must come from the current native screenshot in the tool's coordinate space. Account for image scaling. If the window, layout, or scroll position changes, capture another screenshot before clicking. Never reuse test coordinates or assume a screen size. Keep browser-tab DOM/Playwright and browser-tab accessibility clicks out of this submission sequence.
+Coordinates must come from the current screenshot in the clicking tool's coordinate space. Account for image scaling. If the window, layout, or scroll position changes, capture another screenshot before clicking. Never reuse test coordinates or assume a screen size.
 
-### Optional Codex example
+### Codex example
 
-Other harnesses should use equivalent native-window APIs. In Codex's `cua_repl`, the successful sequence used these calls, with observation and helper recording between them:
+In Codex's `cua_repl`, the successful sequence used these calls, with observation and helper recording between them:
 
 ```javascript
 const chromeApp = await cua.getApp('com.google.Chrome');
@@ -88,8 +94,10 @@ If a CAPTCHA actually appears, stop and tell the user to complete it. Never solv
 
 If a pending click survived an interrupted run, inspect the surviving page or other actual evidence before recording its result. Inspection saying "not indexed" cannot establish whether a request was previously accepted. When evidence is insufficient, retain the unresolved intent, report it for review, and work on other URLs. Never resubmit a confirmed accepted URL merely to test this method. Preserve any recorded manual acceptance too.
 
-## Evidence behind this default
+## Evidence behind these defaults
 
-In a controlled attempt, browser-tab DOM/Playwright clicks repeatedly produced the generic error, and a browser-tab accessibility click also failed. The user succeeded manually after refreshing. The agent then succeeded with native Chrome navigation, a native refresh, and a coordinate click from a fresh native-window screenshot, without browser-tab DOM/Playwright interaction during submission or simulated human movement.
+In a controlled attempt in Codex, browser-tab DOM/Playwright clicks repeatedly produced the generic error, and a browser-tab accessibility click also failed. The user succeeded manually after refreshing. The agent then succeeded with native Chrome navigation, a native refresh, and a coordinate click from a fresh native-window screenshot, without browser-tab DOM/Playwright interaction during submission or simulated human movement.
+
+In a later Claude Code run, the Claude in Chrome extension's tab screenshot and coordinate click submitted without problems. Every click had a clear outcome on screen and none was left unresolved.
 
 GSC confirmed "Przesłano prośbę o zindeksowanie" and entry into its priority indexing queue. This supports the preferred default; it is not a guarantee or proof of the underlying cause. Acceptance means queued for indexing, not confirmed indexed. Keep run-specific screenshots and history in the user's workspace, outside the public skill.
