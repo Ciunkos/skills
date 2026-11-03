@@ -146,12 +146,20 @@ export const openStore = (root = defaultRoot()) => {
   };
   const settings = () => ({ ...defaultSettings(), ...readJson(settingsFile, {}) });
   /* Discovery only adds repositories and refreshes detected ecosystems; it never drops user keys. */
-  const mergeRepos = (found) => {
+  /* `isBanned(path)` comes from the exclude patterns. Entries discovery added under a banned path
+     are dropped; an entry the user wrote something into (notes, commands, holds, skip) is kept,
+     and every command ignores it because its path is banned. */
+  const mergeRepos = (found, isBanned = () => false) => {
     ensure();
-    const current = settings();
-    for (const [name, r] of Object.entries(found)) current.repos[name] = { ...(current.repos[name] || { skip: false, notes: '' }), path: r.path, ecosystems: r.ecosystems };
+    const current = settings(), pruned = [];
+    for (const [name, r] of Object.entries(current.repos)) {
+      if (!isBanned(r.path)) continue;
+      const userData = (r.notes && r.notes.trim()) || r.commands || r.packages || r.skip;
+      if (!userData) { delete current.repos[name]; pruned.push(name); }
+    }
+    for (const [name, r] of Object.entries(found)) if (!isBanned(r.path)) current.repos[name] = { ...(current.repos[name] || { skip: false, notes: '' }), path: r.path, ecosystems: r.ecosystems };
     atomic(settingsFile, JSON.stringify(current, null, 2) + '\n');
-    return current;
+    return { settings: current, pruned };
   };
   const repoLog = (repo, line, at) => {
     const file = join(dir, 'repos', slug(repo), 'log.md');

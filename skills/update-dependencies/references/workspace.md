@@ -40,7 +40,7 @@ Every command prints JSON. Commands that record something take a JSON object wit
 
 - `settings.json`: user-owned. Discovery only adds repositories and refreshes `path` and `ecosystems`.
   ```json
-  { "version": 1, "roots": ["~"], "exclude": ["**/node_modules/**", "~/Library/**", "~/archive/**"],
+  { "version": 1, "roots": ["~"], "exclude": ["**/node_modules/**", "~/Library/**", "~/old-laptop", "/Volumes/Backup"],
     "minReleaseAgeDays": 7,
     "repos": { "web": { "path": "/Users/me/web", "ecosystems": ["npm"], "skip": false,
                "notes": "Keep React 18 until the design system ships 19 support.",
@@ -49,6 +49,7 @@ Every command prints JSON. Commands that record something take a JSON object wit
     "packages": { "some-lib": { "hold": "<3.0.0", "reason": "3.0 moved to BSL license", "until": "2027-01-01" } },
     "ignoreAdvisories": { "GHSA-xxxx-xxxx-xxxx": { "reason": "dev-only, not bundled", "repos": ["web"] } } }
   ```
+  `exclude` bans paths outright: discovery never walks them, entries it added under them are dropped, and `start`, `plan`, and the agent never touch them. A plain path (`"~/old-laptop"`, `"/Volumes/Backup"`) bans that directory and everything below it; a glob (`**`, `*`, `?`, with `~` for home) matches absolute paths. Entries under an excluded path that carry user data (notes, commands, holds, skip) are kept but ignored; `status` lists them as `excludedEntries`.
   A hold is a version range the package must stay inside: `^18`, `<3.0.0`, `3.x`, `1.2.3 - 1.9.0`, an exact version, or several joined with `||`. `until` makes a hold expire; `--unsafe` also ignores expired holds.
 - `events.jsonl`: append-only, fsynced journal of every recorded step. `state.json` is its folded snapshot and can be rebuilt from it.
 - `repos/<repo>/log.md`: readable per-repository history: plan, reviews, holds, applies, rollbacks, checks.

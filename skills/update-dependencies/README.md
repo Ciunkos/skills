@@ -48,7 +48,7 @@ For every npm upgrade it downloads both versions' tarballs, checks them against 
 
 Everything lives in `~/dependencies` (`--storage` picks another directory and is remembered):
 
-- `settings.json`: the repositories, with `skip`, free-text `notes`, custom `commands`, and holds such as `"some-lib": { "hold": "<3.0.0", "reason": "3.0 moved to a non-OSI license" }`. Edit it any time; runs only add newly found repositories.
+- `settings.json`: `exclude` bans directories or patterns outright, for example a backup copy of an old computer (`"~/old-laptop"`): nothing under them is discovered, read, or changed. Then the repositories, with `skip`, free-text `notes`, custom `commands`, and holds such as `"some-lib": { "hold": "<3.0.0", "reason": "3.0 moved to a non-OSI license" }`. Edit it any time; runs only add newly found repositories.
 - `events.jsonl` and `state.json`: a write-ahead log of every planned, reviewed, applied, verified, held, and rolled back change, so an interrupted run can be recovered.
 - `repos/<repo>/log.md`: a readable update and check log per repository. `log.md`: one summary per run.
 

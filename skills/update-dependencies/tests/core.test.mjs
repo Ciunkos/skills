@@ -197,3 +197,47 @@ test('npm detector: caret targets from the lockfile version, holds respected', a
   assert.equal(b.kind, 'held');
   assert.equal(items.some((i) => i.name === 'c'), false, 'file: specs are not registry packages');
 });
+
+import { isExcluded } from '../scripts/discover.mjs';
+import { main } from '../scripts/deps.mjs';
+import { homedir } from 'node:os';
+
+test('isExcluded: plain paths ban a subtree on a path boundary, globs match absolute paths', () => {
+  const h = homedir();
+  assert.equal(isExcluded(`${h}/sanddev`, ['~/sanddev']), true);
+  assert.equal(isExcluded(`${h}/sanddev/home/web/src`, ['~/sanddev/']), true);
+  assert.equal(isExcluded(`${h}/sanddevelopment`, ['~/sanddev']), false, 'prefix must end at a path boundary');
+  assert.equal(isExcluded(`${h}/a/node_modules/b`, ['**/node_modules/**']), true);
+  assert.equal(isExcluded(`${h}/archive/2019/x`, ['~/archive/*/x']), true);
+  assert.equal(isExcluded(`${h}/web`, ['~/sanddev', '/Volumes/Old']), false);
+});
+
+test('ban: discovery never enters an excluded tree, prunes auto-added entries, keeps user notes, start and plan refuse', async () => {
+  const root = tmp(), storage = tmp(), prefs = join(tmp(), 'prefs.json');
+  for (const p of ['live/web', 'backup/home/web', 'backup/home/api']) {
+    mkdirSync(join(root, p), { recursive: true });
+    writeFileSync(join(root, p, 'package.json'), JSON.stringify({ dependencies: { a: '^1.0.0' } }));
+    execFileSync('git', ['init', '-q', join(root, p)]);
+  }
+  const settingsFile = join(storage, 'settings.json');
+  const run = (args) => main([...args, '--storage', storage], { preferences: prefs });
+  writeFileSync(settingsFile, JSON.stringify({ roots: [root], exclude: [] }));
+  const first = await run(['discover']);
+  assert.equal(Object.keys(first.repos).length, 3);
+  const s = JSON.parse(readFileSync(settingsFile, 'utf8'));
+  const api = Object.keys(s.repos).find((n) => s.repos[n].path.endsWith('backup/home/api'));
+  s.repos[api].notes = 'old laptop copy, keep this note';
+  s.exclude = [join(root, 'backup')];
+  writeFileSync(settingsFile, JSON.stringify(s));
+  const second = await run(['discover']);
+  assert.deepEqual(Object.keys(second.repos), ['web'], 'only the live repository is discovered');
+  assert.equal(second.prunedExcluded.length, 1, 'the auto-added backup entry is dropped');
+  const after = JSON.parse(readFileSync(settingsFile, 'utf8'));
+  assert.equal(after.repos[api].notes, 'old laptop copy, keep this note', 'user notes are never deleted');
+  const status = await run(['status']);
+  assert.deepEqual(status.excludedEntries, [api]);
+  const started = await run(['start', 'web', api]);
+  assert.deepEqual(started.scope, ['web']);
+  assert.deepEqual(started.excluded, [api]);
+  await assert.rejects(run(['plan', api, '--run', started.runId]), /excluded path/);
+});

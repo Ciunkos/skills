@@ -24,16 +24,27 @@ export const globToRegExp = (glob) => {
   return new RegExp(`^${re}$`);
 };
 
+/* Exclusion is a ban: a matching path is never walked, listed, planned, or touched.
+   A pattern without glob characters ("~/backup", "/Volumes/Old") bans that directory and
+   everything below it, on a path boundary. Globs (~, **, *, ?) match absolute paths. */
+export const isExcluded = (path, patterns = []) => {
+  const p = expand(path);
+  return patterns.some((pattern) => {
+    if (!/[*?]/.test(pattern)) { const dir = expand(pattern).replace(/\/+$/, ''); return p === dir || p.startsWith(dir + '/'); }
+    const re = globToRegExp(pattern);
+    return re.test(p) || re.test(p + '/');
+  });
+};
+
 const git = (dir, args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 });
 
 export const findRepos = (roots, { exclude = [], maxDepth = 4 } = {}) => {
-  const excluded = exclude.map(globToRegExp);
   const found = new Set();
   const walk = (dir, depth) => {
-    if (excluded.some((re) => re.test(dir) || re.test(dir + '/'))) return;
+    if (isExcluded(dir, exclude)) return;
     if (existsSync(join(dir, '.git'))) {
       found.add(dir);
-      try { for (const sub of git(dir, ['submodule', 'foreach', '--quiet', '--recursive', 'pwd']).split('\n').filter(Boolean)) found.add(sub); } catch { /* no submodules or git error */ }
+      try { for (const sub of git(dir, ['submodule', 'foreach', '--quiet', '--recursive', 'pwd']).split('\n').filter(Boolean)) if (!isExcluded(sub, exclude)) found.add(sub); } catch { /* no submodules or git error */ }
       return;
     }
     if (depth >= maxDepth) return;
@@ -44,7 +55,7 @@ export const findRepos = (roots, { exclude = [], maxDepth = 4 } = {}) => {
       walk(join(dir, e.name), depth + 1);
     }
   };
-  for (const r of roots) walk(expand(r), 0);
+  for (const r of roots) if (!isExcluded(r, exclude)) walk(expand(r), 0);
   return [...found].sort();
 };
 

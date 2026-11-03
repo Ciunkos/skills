@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { resolveRoot, openStore, slug } from './store.mjs';
-import { discover, isDirty, repoFiles } from './discover.mjs';
+import { discover, isDirty, repoFiles, isExcluded } from './discover.mjs';
 import { detectors, byId } from './detectors/index.mjs';
 import { makeRegistry } from './registry.mjs';
 import { makeGithub } from './github.mjs';
@@ -41,9 +41,10 @@ export const main = async (argv = process.argv.slice(2), { preferences, fetcher 
   if (command === 'status') {
     const s = store.load(), settings = store.settings();
     const last = s.runs.at(-1);
+    const banned = Object.entries(settings.repos).filter(([, r]) => isExcluded(r.path, settings.exclude)).map(([n]) => n);
     return {
       workspace: store.dir, settings: store.settingsFile, currentRun: s.currentRun,
-      repos: Object.keys(settings.repos).length, skipped: Object.entries(settings.repos).filter(([, r]) => r.skip).map(([n]) => n),
+      repos: Object.keys(settings.repos).length - banned.length, exclude: settings.exclude, excludedEntries: banned, skipped: Object.entries(settings.repos).filter(([, r]) => r.skip).map(([n]) => n),
       holds: settings.packages, openIntents: s.openIntents,
       lastRun: last && { id: last.id, at: last.at, status: last.status, dryRun: last.dryRun, repos: Object.fromEntries(Object.entries(last.repos).map(([n, r]) => [n, { applied: r.applied.length, held: r.held.length, rolledBack: r.rolledBack.length, skipped: r.skipped }])) }
     };
@@ -64,23 +65,25 @@ export const main = async (argv = process.argv.slice(2), { preferences, fetcher 
     const runDiscovery = () => {
       const s0 = settings();
       const found = discover({ roots: s0.roots, exclude: s0.exclude });
-      const merged = mergeRepos(Object.fromEntries(Object.entries(found).map(([n, r]) => [n, { path: r.path, ecosystems: r.ecosystems }])));
+      const { settings: merged, pruned } = mergeRepos(Object.fromEntries(Object.entries(found).map(([n, r]) => [n, { path: r.path, ecosystems: r.ecosystems }])), (path) => isExcluded(path, s0.exclude));
       emit('discover', { repos: Object.fromEntries(Object.entries(found).map(([n, r]) => [n, { path: r.path, ecosystems: r.ecosystems }])) });
-      return { found, merged };
+      return { found, merged, pruned };
     };
     if (command === 'discover') {
-      const { found } = runDiscovery();
-      return { workspace: store.dir, settings: store.settingsFile, repos: Object.fromEntries(Object.entries(found).map(([n, r]) => [n, { path: r.path, ecosystems: r.ecosystems, findings: r.findings.length }])) };
+      const { found, pruned } = runDiscovery();
+      return { workspace: store.dir, settings: store.settingsFile, exclude: settings().exclude, prunedExcluded: pruned, repos: Object.fromEntries(Object.entries(found).map(([n, r]) => [n, { path: r.path, ecosystems: r.ecosystems, findings: r.findings.length }])) };
     }
     if (command === 'start') {
       let discovered = null;
       if (!Object.keys(settings().repos).length) discovered = Object.keys(runDiscovery().found);
-      const all = settings().repos;
-      const scope = (positional.length ? positional : Object.keys(all)).filter((n) => all[n] && !all[n].skip);
+      const { repos: all, exclude } = settings();
+      const banned = (n) => isExcluded(all[n].path, exclude);
+      const scope = (positional.length ? positional : Object.keys(all)).filter((n) => all[n] && !all[n].skip && !banned(n));
       const unknown = positional.filter((n) => !all[n]);
+      const excluded = positional.filter((n) => all[n] && banned(n));
       const id = randomUUID();
       emit('start', { id, dryRun: !!opts['dry-run'], unsafe: !!opts.unsafe, scope });
-      return { runId: id, workspace: store.dir, scope, skippedBySettings: Object.entries(all).filter(([, r]) => r.skip).map(([n]) => n), unknown, discovered };
+      return { runId: id, workspace: store.dir, scope, skippedBySettings: Object.entries(all).filter(([, r]) => r.skip).map(([n]) => n), excluded, unknown, discovered };
     }
     if (!runId) throw new Error(`${command} needs --run <id> (from start)`);
     const run = state().runs.find((r) => r.id === runId);
@@ -90,6 +93,7 @@ export const main = async (argv = process.argv.slice(2), { preferences, fetcher 
       const name = positional[0] || data.repo;
       const repo = settings().repos[name];
       if (!repo) throw new Error(`Repository ${name} is not in settings.json; run discover`);
+      if (isExcluded(repo.path, settings().exclude)) throw new Error(`Repository ${name} (${repo.path}) is under an excluded path in settings.json; it is never planned or changed`);
       const dirty = isDirty(repo.path);
       if (dirty.length && !data.allowDirty) {
         emit('skip', { runId, repo: name, reason: `uncommitted changes not made by this run (${dirty.slice(0, 5).join('; ')}${dirty.length > 5 ? '; …' : ''})` });
