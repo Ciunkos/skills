@@ -7,6 +7,7 @@ Agent Skills by [Przemysław Zalewski](https://ciunkos.com), published in the [A
 | [business-idea-validator](skills/business-idea-validator/) ([page](https://ciunkos.com/skills/business-idea-validator)) | Scores a business idea on ten rubrics (1 to 5, with quoted evidence and confidence) and applies a fixed verdict rule: Build, Validate first, Pivot or Stop. Returns Markdown and JSON, in English or Polish. Also runs online at [ciunkos.com/business-idea-validator](https://ciunkos.com/business-idea-validator). |
 | [przemo](skills/przemo/) ([page](https://ciunkos.com/skills/przemo)) | Przemo in your terminal. Reviews code hard (verdict, blockers, nits with `file:line`), answers hard calls, does the task (reads code, runs tests, fixes) and talks like Przemysław on Slack: short, dry, Polish by default, harsh on tools, warm to people. Answers at 2 AM too. The web version is [ciunkos.com/przemo](https://ciunkos.com/przemo). |
 | [indexnow](skills/indexnow/) ([page](https://ciunkos.com/skills/indexnow)) | The IndexNow missing from GSC. Uses your signed-in browser to prioritize indexing requests, continues until Google's actual quota response, and remembers retries and a dead-letter queue under `~/indexnow`. Includes a prompt for your own agent's scheduler. |
+| [update-dependencies](skills/update-dependencies/) ([page](https://ciunkos.com/skills/update-dependencies)) | Keeps every repository on your machine up to date: npm, Node.js, Dockerfiles, GitHub Actions, Python and Xcode dependencies, on releases at least a week old. Reviews each npm release by diffing the published tarballs, migrates breaking changes, runs your checks, pins Actions by SHA and images by digest, and logs every step under `~/dependencies`. Includes a prompt for your own agent's scheduler. |
 
 ## Install
 
@@ -24,7 +25,7 @@ claude plugin marketplace add Ciunkos/skills
 claude plugin install ciunkos@ciunkos
 ```
 
-Run `/reload-plugins` (or start a new session), then `/przemo <question or task>`, `/business-idea-validator <your idea>`, or `/indexnow <domain> [hint]`. If another plugin has a skill with the same name, use the full name, such as `/ciunkos:indexnow`.
+Run `/reload-plugins` (or start a new session), then `/przemo <question or task>`, `/business-idea-validator <your idea>`, `/indexnow <domain> [hint]`, or `/update-dependencies`. If another plugin has a skill with the same name, use the full name, such as `/ciunkos:indexnow`.
 
 **Codex and other agents that read Agent Skills** (Cursor, Windsurf, custom): clone once and symlink the skills you want into the folder your agent loads skills from.
 
@@ -90,6 +91,7 @@ node --test                                   # all tests
 npx skills-ref validate skills/business-idea-validator
 npx skills-ref validate skills/przemo
 npx skills-ref validate skills/indexnow
+npx skills-ref validate skills/update-dependencies
 claude plugin validate --strict .             # with Claude Code installed
 node skills/business-idea-validator/scripts/check.mjs skills/business-idea-validator/assets/examples/fieldnote/report.json --stdout
 ```
@@ -102,6 +104,6 @@ MIT, see `LICENSE`.
 
 ## Releases
 
-Every push to `main` that raises a version publishes a [GitHub Release](https://github.com/Ciunkos/skills/releases) with the notes from the skill's `CHANGELOG.md` and a `.skill` file you can upload to claude.ai or Claude Desktop. The stable download links are [business-idea-validator.skill](https://github.com/Ciunkos/skills/releases/latest/download/business-idea-validator.skill), [przemo.skill](https://github.com/Ciunkos/skills/releases/latest/download/przemo.skill), and [indexnow.skill](https://github.com/Ciunkos/skills/releases/latest/download/indexnow.skill). Indexnow needs a runner with local filesystem and authenticated browser tools; the package alone does not supply them.
+Every push to `main` that raises a version publishes a [GitHub Release](https://github.com/Ciunkos/skills/releases) with the notes from the skill's `CHANGELOG.md` and a `.skill` file you can upload to claude.ai or Claude Desktop. The stable download links are [business-idea-validator.skill](https://github.com/Ciunkos/skills/releases/latest/download/business-idea-validator.skill), [przemo.skill](https://github.com/Ciunkos/skills/releases/latest/download/przemo.skill), [indexnow.skill](https://github.com/Ciunkos/skills/releases/latest/download/indexnow.skill), and [update-dependencies.skill](https://github.com/Ciunkos/skills/releases/latest/download/update-dependencies.skill). Indexnow needs a runner with local filesystem and authenticated browser tools, and update-dependencies a runner with a shell, git, and network access; the package alone does not supply them.
 
 To release a change: `node scripts/bump.mjs <skill> patch|minor|major`, write the new `## <version>` section in the skill's `CHANGELOG.md`, commit, push. `node scripts/release-plan.mjs --check` tells you before the push whether the release would go through.

@@ -14,9 +14,9 @@ Read before changing anything. These apply to people and agents alike.
 
 - Zero dependencies. Plain Node 20+, ES modules, `node --test`. No build step.
 - `scripts/verdict.mjs`, `scripts/render.mjs`, `scripts/i18n.mjs`, `scripts/schema.mjs` must stay free of Node-only APIs (`node:*`, `process`, `fs`, `path`). They are bundled into a Cloudflare Worker as they are. `tests/purity.test.mjs` enforces this.
-- In business-idea-validator, `scripts/check.mjs` is the only file that reads or writes the disk. Indexnow's storage and CLI helpers may write its external workspace and storage preferences.
+- In business-idea-validator, `scripts/check.mjs` is the only file that reads or writes the disk. Indexnow's storage and CLI helpers may write its external workspace and storage preferences. Update-dependencies' helpers may write only its external workspace (`~/dependencies` or the remembered storage); they never write to a repository.
 - Arrow functions, small files, a header comment that says what the file is for.
-- Nothing in this repository runs on its own or installs a scheduler. Indexnow may read public websites and request indexing through the user's authenticated GSC browser when invoked. Its helpers never submit to Google or read browser credentials. Other skills retain their existing behavior.
+- Nothing in this repository runs on its own or installs a scheduler. Indexnow may read public websites and request indexing through the user's authenticated GSC browser when invoked. Its helpers never submit to Google or read browser credentials. Other skills retain their existing behavior. Update-dependencies may read package registries, Docker Hub, PyPI, CocoaPods trunk, nodejs.org and the GitHub API, and the agent applies upgrades in the user's repositories when invoked; its helpers never install packages or run package code.
 
 ## Skills
 

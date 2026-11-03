@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update dependencies"
+  short_description: "Review, upgrade, and migrate dependencies across repositories"
+  default_prompt: "Use $update-dependencies to update the dependencies in my repositories."

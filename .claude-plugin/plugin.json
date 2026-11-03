@@ -1,7 +1,7 @@
 {
   "name": "ciunkos",
-  "version": "0.6.1",
-  "description": "Skills by Przemysław Zalewski (ciunkos.com). business-idea-validator: score a business idea and get a fixed-rule verdict. przemo: reviews code, answers hard calls, and does the work. indexnow: prioritize Google Search Console indexing requests and persist retries, results, and a dead-letter queue.",
+  "version": "0.7.0",
+  "description": "Skills by Przemysław Zalewski (ciunkos.com). business-idea-validator: score a business idea and get a fixed-rule verdict. przemo: reviews code, answers hard calls, and does the work. indexnow: prioritize Google Search Console indexing requests and persist retries, results, and a dead-letter queue. update-dependencies: upgrade dependencies across repositories after reviewing each release, migrate breaking changes, and keep a write-ahead log.",
   "author": {
     "name": "Przemysław Zalewski",
     "url": "https://ciunkos.com"
@@ -22,6 +22,11 @@
     "code-review",
     "indexnow",
     "google-search-console",
-    "indexing"
+    "indexing",
+    "dependencies",
+    "supply-chain",
+    "npm",
+    "github-actions",
+    "docker"
   ]
 }

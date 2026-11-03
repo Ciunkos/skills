@@ -32,6 +32,7 @@ jobs:
       - run: npx -y skills-ref validate skills/business-idea-validator
       - run: npx -y skills-ref validate skills/przemo
       - run: npx -y skills-ref validate skills/indexnow
+      - run: npx -y skills-ref validate skills/update-dependencies
       - name: Plan
         run: node scripts/release-plan.mjs --check
       - name: Package and release
