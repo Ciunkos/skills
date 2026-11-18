@@ -38,11 +38,15 @@ export const isExcluded = (path, patterns = []) => {
 
 const git = (dir, args) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 });
 
+export const hasCommits = (dir) => { try { git(dir, ['rev-parse', '--verify', '--quiet', 'HEAD']); return true; } catch { return false; } };
+
 export const findRepos = (roots, { exclude = [], maxDepth = 4 } = {}) => {
   const found = new Set();
   const walk = (dir, depth) => {
     if (isExcluded(dir, exclude)) return;
-    if (existsSync(join(dir, '.git'))) {
+    /* A .git without a single commit (an accidental `git init` in a home folder) is not a project:
+       treating it as one would hide every repository below it. Walk past it instead. */
+    if (existsSync(join(dir, '.git')) && hasCommits(dir)) {
       found.add(dir);
       try { for (const sub of git(dir, ['submodule', 'foreach', '--quiet', '--recursive', 'pwd']).split('\n').filter(Boolean)) if (!isExcluded(sub, exclude)) found.add(sub); } catch { /* no submodules or git error */ }
       return;

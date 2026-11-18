@@ -6,7 +6,7 @@ Every command prints JSON. Commands that record something take a JSON object wit
 
 | Command | Input | Effect |
 |---|---|---|
-| `discover` | | Scan `roots`, run detectors, merge repositories into `settings.json`, record `discover`. |
+| `discover` | | Scan `roots`, run detectors, merge repositories into `settings.json`, record `discover`. A `.git` with no commits (an accidental `git init` in a home folder) is walked past, not taken as a repository. |
 | `status` | | Workspace paths, repository count, skips, holds, open intents, last run summary. Read-only. |
 | `log [repo]` | | The global `log.md`, or one repository's `repos/<repo>/log.md`. Read-only. |
 | `start [repo...]` | | Open a run (`--dry-run`, `--unsafe` are recorded). Discovers first when no repositories are recorded. Fails if another run is open. |
@@ -14,11 +14,12 @@ Every command prints JSON. Commands that record something take a JSON object wit
 | `inspect <pkg> <from> <to>` | `--repo R` to record it | npm tarball and metadata diff. Records `review` when `--run` and `--repo` are given. |
 | `held` | `{repo, name, from, to, reason}` | A deliberate non-upgrade (concern, hold, note, dry run). |
 | `skip` | `{repo, reason}` | Skip a whole repository for this run. |
-| `intent` | `{repo, name, from, to, files[]}` | Write-ahead entry before touching files. Returns `intentId`. Refused in a dry run. |
+| `intent` | `{repo, name, from, to, files[]}` | Write-ahead entry before touching files. Returns `intentId`. Refused in a dry run, for a repository not in settings, and without `files` (relative paths inside the repository). Use the plan item's `name` as is (detail may follow after a space); a group names its packages: `react group (react, react-dom)`. |
 | `applied` | `{intentId, notes?, migration?}` | The change is in the working tree. |
 | `rolledBack` | `{intentId, reason}` | Files were restored from git. |
 | `verified` | `{repo, ok, checks:[{cmd, ok, detail?}]}` | Results of the repository's checks. |
-| `finish` | `{status?, summary}` | Close the run. Refused while intents are open. |
+| `assert <repo>` | | Compare the working tree with the run's record (see below). Records `asserted`; any later `applied` or `rolledBack` makes it stale. |
+| `finish` | `{status?, summary, incomplete?}` | Close the run. Refused while intents are open or a changed repository has no passing assert; `incomplete: "<why>"` closes it as incomplete. |
 | `recover` | | Close an interrupted run; every open intent becomes a rollback to perform, with its files listed. |
 
 ## plan output
@@ -33,6 +34,8 @@ Every command prints JSON. Commands that record something take a JSON object wit
   ],
   "held": [], "review": [], "errors": [] }
 ```
+
+Targets come only from versions the registry still serves and never above the `latest` dist-tag: unpublished versions stay in the registry's `time` map forever and must not be picked.
 
 `latest` higher than `to` means the newer release is still inside the age window; it is picked up by a later run.
 
@@ -55,3 +58,14 @@ Every command prints JSON. Commands that record something take a JSON object wit
 - `repos/<repo>/log.md`: readable per-repository history: plan, reviews, holds, applies, rollbacks, checks.
 - `log.md`: one summary per run.
 - `.lock`: one run at a time across all repositories; a lock left by a dead process is cleared automatically.
+
+## assert output
+
+```json
+{ "repo": "web", "ok": false,
+  "errors": ["a: applied 2.0.0 but package-lock.json has 1.0.0 (a later step restored an older lockfile?)",
+             "zod: held at 3.23.8 but the lockfile has 3.25.76 (moved by another step, such as npm audit fix or a group install)"],
+  "warnings": ["openai: changed 4.73.0 → 4.104.0 with no recorded outcome; inspect it and record it"] }
+```
+
+Errors: a planned item with no outcome; an applied npm item whose lockfile version differs (resolved past the target means a missing cooldown); an applied item of another ecosystem whose file lacks the target; a held or rolled-back package that moved; a direct dependency that went down without an outcome; an npm project without `min-release-age`; no passing `verified` after the last change. Warnings: direct changes without an outcome, transitive downgrades.

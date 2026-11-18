@@ -27,16 +27,23 @@ export const prefixOf = (spec) => (/^\^/.test(spec) ? '^' : /^~/.test(spec) ? '~
 /**
  * Newest stable version published at least `minAgeDays` before `now`, never below `current`.
  * `times` is the registry's version → ISO publish date map. `allowMajor: false` keeps the major.
+ * `available` (the versions the registry still serves) drops unpublished versions, which stay in
+ * `times` forever: an old 1.58.1 of a package now on 0.187 must never be picked. `ceiling` (the
+ * `latest` dist-tag) caps the pick: nothing above what the maintainers call latest.
  * Returns { version, publishedAt, kind } or null when nothing newer is eligible.
  */
-export const pickTarget = ({ times, current, minAgeDays = 7, now = Date.now(), allowMajor = true, exclude = [] }) => {
+export const pickTarget = ({ times, current, minAgeDays = 7, now = Date.now(), allowMajor = true, exclude = [], available = null, ceiling = null }) => {
   const cur = parse(current);
   if (!cur) return null;
   const cutoff = now - minAgeDays * 86_400_000;
+  const top = ceiling ? parse(ceiling) : null, cap = top && !top.pre ? top : null;
+  const served = available ? new Set(available) : null;
   let best = null;
   for (const [v, at] of Object.entries(times || {})) {
     const p = parse(v);
     if (!p || p.pre || exclude.includes(v)) continue;
+    if (served && !served.has(v)) continue;
+    if (cap && compare(p, cap) > 0) continue;
     if (Date.parse(at) > cutoff) continue;
     if (compare(p, cur) <= 0) continue;
     if (!allowMajor && kind(current, v) === 'major') continue;

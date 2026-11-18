@@ -20,4 +20,10 @@ Record every command with its result in `verified`. A check that cannot run (mis
 
 ## Rollback
 
-Restore exactly the files listed in the intent from git (`git checkout -- <files>`), reinstall from the lockfile (`npm ci --ignore-scripts`), rerun the failing check to confirm the repository is back to green, and record `rolledBack` with the error that caused it. Never reset or clean the whole repository.
+Restore exactly the files listed in the intent to their state right before that item, reinstall from the lockfile (`npm ci --ignore-scripts`), rerun the failing check to confirm the repository is back to green, and record `rolledBack` with the error that caused it. Never reset or clean the whole repository.
+
+Restoring from git (`git checkout -- <files>`) is right only when nothing else in the run touched those files yet. Several items share `package.json` and the lockfile, so restoring them from HEAD silently undoes every earlier item. Keep a copy of the intent's files before each change and restore that copy. `assert` reports an applied item the lockfile no longer has.
+
+## Assert
+
+After the last `verified` of a repository, run `deps.mjs assert <repo> --run ID`. It must pass before `finish`. A failing assert is a step to fix, not a note: reinstall the missing version, record the extra change, or roll back the item and record it.

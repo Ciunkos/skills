@@ -37,8 +37,8 @@ export const outdated = async (repo, finding, { registry, minAgeDays, now = Date
     try { doc = await registry.packument(name); } catch (e) { items.push({ ecosystem: id, project: finding.project, name, from: current, error: e.message }); continue; }
     const hold = holds[name];
     const exclude = hold?.hold ? Object.keys(doc.time || {}).filter((v) => parse(v) && !allowedByHold(v, hold.hold)) : [];
-    const target = pickTarget({ times: doc.time, current, minAgeDays, now, exclude });
     const latest = doc['dist-tags']?.latest;
+    const target = pickTarget({ times: doc.time, current, minAgeDays, now, exclude, available: Object.keys(doc.versions || {}), ceiling: latest });
     if (target) items.push({
       ecosystem: id, project: finding.project, section, name, from: current, to: target.version, kind: target.kind,
       spec, newSpec: `${prefix === '' ? '^' : prefix}${target.version}`, publishedAt: target.publishedAt, latest,

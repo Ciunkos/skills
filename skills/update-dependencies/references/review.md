@@ -10,7 +10,7 @@ The goal is to notice a compromised or surprising release before it is installed
 | `native-binary-added`, `native-build-added` | concern | Opaque code. Expected only when the package ships prebuilt binaries and says so. |
 | `obfuscation`, `blob`, `high-entropy-code` | concern | `_0x` identifiers, long hex or base64 strings, or one-line high-entropy files that were not there before. Minified `dist/` bundles are normal; a new blob in source files is not. |
 | `reads-secrets` | concern | New reads of `NPM_TOKEN`, `GITHUB_TOKEN`, cloud keys, or anything named SECRET or PASSWORD. |
-| `new-publisher`, `publishing-moved-off-ci` | concern | Someone outside the previous maintainers published, or a package that came from CI trusted publishing is now published by hand. Typical of account takeovers. |
+| `new-publisher`, `publishing-moved-off-ci` | concern | Someone outside the previous maintainers published, or a package that came from CI trusted publishing is now published by hand. Typical of account takeovers. A renamed account of the same author looks the same in registry metadata; only the project's own announcement or repository history tells them apart, so it stays held until a person checks. |
 | `provenance-lost` | concern | The previous version had a provenance attestation and this one does not. |
 | `license-changed` | concern | MIT to BSL, SSPL, a custom license, or none changes whether you may use it. Hold and tell the user. |
 | `child-process`, `dynamic-code`, `network` | review | New process spawning, `eval`/`new Function`, or network modules. Fine for a CLI or a dev server; odd for a parser or a UI library. |
@@ -31,3 +31,7 @@ Heuristics miss things and flag innocent things. When a signal is in a file the 
 - GitHub Actions: read the release notes of the action between the two tags; check for changed inputs, a new Node runtime, or removed outputs. Pin by SHA from `plan`.
 - Docker: a new major of a base image can change the OS release, default user, or runtime; read the image's release notes. The digest pin is from Docker Hub for the exact tag.
 - Python, SwiftPM, CocoaPods: read the project's release notes; there is no tarball diff yet, so be stricter about majors.
+
+## Changes you did not plan
+
+`npm audit fix`, a peer group install, or a reinstall can move packages beyond the item you applied. After each of them, list the direct dependencies whose locked version changed and `inspect` each one. A `concern` among them is restored to its previous version in the lockfile and recorded as `held`; the rest are recorded as applied. `assert` flags held packages that moved and direct changes without an outcome.

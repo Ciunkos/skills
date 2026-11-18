@@ -12,9 +12,10 @@ import { detectors, byId } from './detectors/index.mjs';
 import { makeRegistry } from './registry.mjs';
 import { makeGithub } from './github.mjs';
 import { inspectNpm } from './inspect.mjs';
+import { assertRepo } from './assert.mjs';
 
 const USAGE = 'Usage: node deps.mjs <command> [args] [--storage DIR] [--run ID] [--input FILE|-] [--only ECOSYSTEM] [--dry-run] [--unsafe]\n' +
-  'Commands: discover, status, start [repo...], plan <repo>, inspect <package> <from> <to> [--repo R], skip, held, intent, applied, rolledBack, verified, finish, recover, log [repo]';
+  'Commands: discover, status, start [repo...], plan <repo>, inspect <package> <from> <to> [--repo R], skip, held, intent, applied, rolledBack, verified, assert <repo>, finish, recover, log [repo]';
 const FLAGS = new Set(['--storage', '--run', '--input', '--only', '--repo', '--dry-run', '--unsafe']);
 
 export const parseArgs = (argv) => {
@@ -122,6 +123,29 @@ export const main = async (argv = process.argv.slice(2), { preferences, fetcher 
       for (const h of held) emit('held', { runId, repo: name, name: h.name, from: h.from, to: h.latest, reason: `settings hold ${h.hold.range}${h.hold.reason ? ': ' + h.hold.reason : ''}` });
       return { repo: name, path: repo.path, notes: repo.notes || '', ecosystems: [...new Set(findings.map((f) => f.ecosystem))], references: [...new Set(findings.map((f) => byId[f.ecosystem].reference))], items: planned, held, review: items.filter((i) => !i.to && !i.error && i.kind !== 'held'), errors: [...errors, ...items.filter((i) => i.error)] };
     }
+    /* Records name a real repository: a typo or a shell that did not split a list must fail
+       here, not land in the journal as a repository that does not exist. */
+    const known = (name) => {
+      const repo = settings().repos[name];
+      if (!name || !repo) throw new Error(`Unknown repository ${JSON.stringify(name)}: use a name from settings.json (one repository per record)`);
+      if (isExcluded(repo.path, settings().exclude)) throw new Error(`Repository ${name} is under an excluded path`);
+      return repo;
+    };
+    if (['skip', 'held', 'intent', 'verified'].includes(command) || (command === 'rolledBack' && !data.intentId)) known(data.repo);
+    if (command === 'intent') {
+      const files = data.files;
+      if (!Array.isArray(files) || !files.length) throw new Error('intent needs files: the exact paths, relative to the repository, that this step will change');
+      const bad = files.filter((f) => typeof f !== 'string' || !f || f.startsWith('/') || f.split('/').includes('..'));
+      if (bad.length) throw new Error(`intent files must be relative paths inside the repository: ${bad.join(', ')}`);
+    }
+    if (command === 'assert') {
+      const name = positional[0] || data.repo, repo = known(name);
+      const record = run.repos[name];
+      if (!record) throw new Error(`Run ${runId} has no record for ${name}`);
+      const result = assertRepo({ path: repo.path, record, minReleaseAgeDays: settings().minReleaseAgeDays });
+      emit('asserted', { runId, repo: name, ...result });
+      return { repo: name, ...result };
+    }
     if (command === 'skip') return emit('skip', { runId, repo: data.repo, reason: data.reason }) && { ok: true };
     if (command === 'held') { emit('held', { runId, repo: data.repo, name: data.name, from: data.from, to: data.to, reason: data.reason }); return { ok: true }; }
     if (command === 'intent') {
@@ -133,7 +157,7 @@ export const main = async (argv = process.argv.slice(2), { preferences, fetcher 
     if (command === 'applied') { emit('applied', { runId, intentId: data.intentId, notes: data.notes, migration: data.migration }); return { ok: true }; }
     if (command === 'rolledBack') { emit('rolledBack', { runId, intentId: data.intentId, repo: data.repo, name: data.name, from: data.from, to: data.to, reason: data.reason }); return { ok: true }; }
     if (command === 'verified') { emit('verified', { runId, repo: data.repo, ok: !!data.ok, checks: data.checks || [] }); return { ok: true }; }
-    if (command === 'finish') { emit('finish', { runId, status: data.status || 'completed', summary: data.summary || '' }); return { ok: true, log: join(store.dir, 'log.md') }; }
+    if (command === 'finish') { emit('finish', { runId, status: data.status || 'completed', summary: data.summary || '', incomplete: data.incomplete || null }); return { ok: true, log: join(store.dir, 'log.md') }; }
     if (command === 'recover') {
       const open = Object.entries(state().openIntents).filter(([, i]) => i.runId === runId).map(([id, i]) => ({ intentId: id, ...i }));
       emit('recover', { runId });

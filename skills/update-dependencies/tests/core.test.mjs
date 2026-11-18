@@ -20,6 +20,8 @@ import * as npm from '../scripts/detectors/npm.mjs';
 const DAY = 86_400_000, NOW = Date.parse('2026-11-03T12:00:00Z');
 const ago = (d) => new Date(NOW - d * DAY).toISOString();
 const tmp = () => mkdtempSync(join(tmpdir(), 'deps-test-'));
+/* A repository as discovery sees one: initialized and with a commit. */
+const gitRepo = (dir) => { execFileSync('git', ['init', '-q', dir]); execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@example.com', 'commit', '-q', '--allow-empty', '-m', 'init']); };
 
 test('pickTarget: newest stable old enough, never lower than current', () => {
   const times = { '4.150.0': ago(30), '4.153.0': ago(9), '4.157.0': ago(0.2), '5.0.0-beta.1': ago(20), '4.156.0': ago(2) };
@@ -75,6 +77,8 @@ test('store: applied moves the intent into the run and records the version', asy
     emit('intent', { runId: 'r', id: 'a', repo: 'web', name: 'x', from: '1.0.0', to: '1.1.0', files: ['package.json'] });
     emit('applied', { runId: 'r', intentId: 'a', notes: 'patch' });
     emit('verified', { runId: 'r', repo: 'web', ok: true, checks: [{ cmd: 'npm test', ok: true }] });
+    assert.throws(() => emit('finish', { runId: 'r', summary: 'ok' }), /Assert these repositories first/);
+    emit('asserted', { runId: 'r', repo: 'web', ok: true, errors: [], warnings: [] });
     emit('finish', { runId: 'r', summary: 'ok' });
   });
   const s = store.load();
@@ -95,7 +99,7 @@ test('discover: repositories and every detector on a fixture tree', () => {
   write('App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved', JSON.stringify({ pins: [{ identity: 'alamofire', location: 'https://github.com/Alamofire/Alamofire.git', state: { version: '5.8.0' } }] }));
   write('Podfile.lock', 'PODS:\n  - Firebase/Core (10.1.0)\n  - Kingfisher (7.9.0)\n');
   write('node_modules/x/package.json', '{"dependencies":{"evil":"1.0.0"}}');
-  execFileSync('git', ['init', '-q', repo]);
+  gitRepo(repo);
   const found = discover({ roots: [root], exclude: [] });
   const r = found.proj;
   assert.ok(r, 'repository found');
@@ -186,8 +190,8 @@ test('npm detector: caret targets from the lockfile version, holds respected', a
   writeFileSync(join(repo, 'package.json'), JSON.stringify({ dependencies: { a: '1.0.0', b: '^2.0.0', c: 'file:../c' } }));
   writeFileSync(join(repo, 'package-lock.json'), JSON.stringify({ packages: { 'node_modules/a': { version: '1.0.0' }, 'node_modules/b': { version: '2.1.0' } } }));
   const docs = {
-    a: { time: { '1.0.0': ago(100), '1.4.0': ago(20), '1.5.0': ago(2) }, 'dist-tags': { latest: '1.5.0' } },
-    b: { time: { '2.1.0': ago(100), '3.0.0': ago(30) }, 'dist-tags': { latest: '3.0.0' } }
+    a: { time: { '1.0.0': ago(100), '1.4.0': ago(20), '1.5.0': ago(2) }, versions: { '1.0.0': {}, '1.4.0': {}, '1.5.0': {} }, 'dist-tags': { latest: '1.5.0' } },
+    b: { time: { '2.1.0': ago(100), '3.0.0': ago(30) }, versions: { '2.1.0': {}, '3.0.0': {} }, 'dist-tags': { latest: '3.0.0' } }
   };
   const registry = { packument: async (n) => docs[n] };
   const items = await npm.outdated(repo, { manifest: 'package.json', project: '.', lock: 'package-lock.json' }, { registry, minAgeDays: 7, now: NOW, holds: { b: { hold: '^2', reason: 'license' } } });
@@ -217,7 +221,7 @@ test('ban: discovery never enters an excluded tree, prunes auto-added entries, k
   for (const p of ['live/web', 'backup/home/web', 'backup/home/api']) {
     mkdirSync(join(root, p), { recursive: true });
     writeFileSync(join(root, p, 'package.json'), JSON.stringify({ dependencies: { a: '^1.0.0' } }));
-    execFileSync('git', ['init', '-q', join(root, p)]);
+    gitRepo(join(root, p));
   }
   const settingsFile = join(storage, 'settings.json');
   const run = (args) => main([...args, '--storage', storage], { preferences: prefs });

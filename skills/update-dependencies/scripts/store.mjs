@@ -56,7 +56,9 @@ export const acquireLock = (dir) => {
 export const createState = () => ({ version: 1, seq: 0, repos: {}, runs: [], currentRun: null, openIntents: {} });
 
 const runOf = (s, id) => s.runs.find((r) => r.id === id);
-const repoRun = (run, repo) => (run.repos[repo] ??= { planned: [], reviewed: [], applied: [], held: [], rolledBack: [], verified: [], skipped: null });
+const repoRun = (run, repo) => (run.repos[repo] ??= { planned: [], reviewed: [], applied: [], held: [], rolledBack: [], verified: [], skipped: null, lastChangeAt: null, asserted: null });
+/* Every change to a repository makes earlier checks and assertions stale. */
+const changed = (run, repo, at) => { const r = repoRun(run, repo); r.lastChangeAt = at; r.asserted = null; };
 
 /* Pure reducer: the journal is the source of truth, state.json is a cache of this fold. */
 export const applyEvent = (state, event) => {
@@ -85,6 +87,7 @@ export const applyEvent = (state, event) => {
       const intent = s.openIntents[d.intentId];
       if (!intent) throw new Error(`No open intent ${d.intentId}`);
       repoRun(run, intent.repo).applied.push({ name: intent.name, from: intent.from, to: intent.to, notes: d.notes || '', migration: d.migration || null });
+      changed(run, intent.repo, event.at);
       delete s.openIntents[d.intentId];
       s.repos[intent.repo] ??= {};
       (s.repos[intent.repo].versions ??= {})[intent.name] = intent.to;
@@ -94,14 +97,20 @@ export const applyEvent = (state, event) => {
       const intent = s.openIntents[d.intentId];
       const target = intent || { repo: d.repo, name: d.name, from: d.from, to: d.to };
       repoRun(run, target.repo).rolledBack.push({ name: target.name, from: target.from, to: target.to, reason: d.reason });
+      changed(run, target.repo, event.at);
       if (intent) delete s.openIntents[d.intentId];
       else if (s.repos[target.repo]?.versions?.[target.name] === target.to) s.repos[target.repo].versions[target.name] = target.from;
       break;
     }
     case 'verified': repoRun(run, d.repo).verified.push({ checks: d.checks || [], ok: !!d.ok, at: event.at }); break;
+    case 'asserted': repoRun(run, d.repo).asserted = { ok: !!d.ok, errors: d.errors || [], warnings: d.warnings || [], at: event.at }; break;
     case 'finish':
       if (Object.values(s.openIntents).some((i) => i.runId === d.runId)) throw new Error('Resolve open intents (applied or rolledBack) before finish');
-      run.status = d.status || 'completed'; run.finishedAt = event.at; run.summary = d.summary || '';
+      if (!d.incomplete) {
+        const unasserted = Object.entries(run.repos).filter(([, r]) => (r.applied.length || r.rolledBack.length) && !r.asserted?.ok).map(([n]) => n);
+        if (unasserted.length) throw new Error(`Assert these repositories first (deps.mjs assert <repo>), or finish with {"incomplete": "<why>"}: ${unasserted.join(', ')}`);
+      }
+      run.status = d.incomplete ? 'incomplete' : d.status || 'completed'; run.finishedAt = event.at; run.summary = [d.summary, d.incomplete && `Incomplete: ${d.incomplete}`].filter(Boolean).join('\n');
       if (s.currentRun === d.runId) s.currentRun = null;
       break;
     case 'recover':
@@ -126,6 +135,7 @@ const LOG_LINE = {
   intent: (d) => `- Applying ${d.name} ${d.from} → ${d.to} (files: ${(d.files || []).join(', ')})`,
   applied: (d, i) => `- Applied ${i.name} ${i.from} → ${i.to}${d.migration ? '. Migration: ' + d.migration : ''}${d.notes ? '. ' + d.notes : ''}`,
   rolledBack: (d, i) => `- Rolled back ${(i || d).name} ${(i || d).from} → ${(i || d).to}: ${d.reason}`,
+  asserted: (d) => `- Assert ${d.ok ? 'passed' : 'FAILED'}${d.errors?.length ? ': ' + d.errors.join('; ') : ''}${d.warnings?.length ? ' (warnings: ' + d.warnings.join('; ') + ')' : ''}`,
   verified: (d) => `- Checks ${d.ok ? 'passed' : 'FAILED'}: ${(d.checks || []).map((c) => `${c.cmd} ${c.ok ? 'ok' : 'fail'}${c.detail ? ' (' + c.detail + ')' : ''}`).join('; ')}`
 };
 
