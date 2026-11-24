@@ -4,7 +4,7 @@ description: Validate a business or startup idea against ten rubrics (problem, c
 license: MIT
 compatibility: Any agent that can read files and run Node 20+ (for scripts/check.mjs). Subagents are optional.
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
   author: Przemysław Zalewski
   homepage: https://ciunkos.com/business-idea-validator
   usage: "<idea text or path to a file> [--lang en|pl] [--quick] [--offline] [--out <dir>]"

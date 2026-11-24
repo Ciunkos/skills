@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- FieldNote example: the landscape association link points at its home page. Its English page now returns 404.
+
 ## 0.2.0
 
 Market scan: who already does this, and where the customers gather.

@@ -60,7 +60,7 @@ Web scan of 2026-10-28. Each row links to the page it was read from. Prices are 
 
 Public places where your customers gather. Ask about the problem; do not pitch the product.
 
-- [Stowarzyszenie Architektury Krajobrazu (SAK)](https://sak.org.pl/en/): The Polish member of the European Landscape Contractors Association, started by green-area contractors. Ask whether a short survey can go to members.
+- [Stowarzyszenie Architektury Krajobrazu (SAK)](https://sak.org.pl/): The Polish member of the European Landscape Contractors Association, started by green-area contractors. Ask whether a short survey can go to members.
 - [Oferteo: garden construction firms](https://www.oferteo.pl/zakladanie-ogrodow): Small landscaping companies list themselves here to win jobs. Their public company pages show region and services, which is enough to pick owners to call.
 - [Panorama Firm: gardening](https://panoramafirm.pl/ogrodnictwo): A business directory of gardening companies by region, useful to reach owners outside the forty you already know.
 
